@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Prof. Dr. Ahmet Turan Evlice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body class="dashboard-page">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-user-md"></i>
+                <div>
+                    <span class="logo-title">Admin Panel</span>
+                    <span class="logo-subtitle">Prof. Dr. A.T. Evlice</span>
+                </div>
+            </div>
+            <button class="sidebar-close" id="sidebar-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item active" data-page="dashboard">
+                    <a href="#dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-section-title">İçerik Yönetimi</li>
+                <li class="nav-item" data-page="pages">
+                    <a href="#pages">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Sayfa İçerikleri</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-page="blogs">
+                    <a href="#blogs">
+                        <i class="fas fa-newspaper"></i>
+                        <span>Blog Yazıları</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-page="new-blog">
+                    <a href="#new-blog">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Yeni Yazı</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-page="media">
+                    <a href="#media">
+                        <i class="fas fa-images"></i>
+                        <span>Medya Galerisi</span>
+                    </a>
+                </li>
+                <li class="nav-section-title">Sistem</li>
+                <li class="nav-item" data-page="settings">
+                    <a href="#settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Ayarlar</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="../index.html" class="view-site" target="_blank">
+                <i class="fas fa-external-link-alt"></i>
+                <span>Siteyi Görüntüle</span>
+            </a>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <button class="sidebar-toggle" id="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="topbar-search">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Ara...">
+            </div>
+            
+            <div class="topbar-actions">
+                <button class="theme-toggle-btn" id="theme-toggle" title="Tema Değiştir">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+                
+                <button class="topbar-btn notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                
+                <div class="user-dropdown">
+                    <button class="user-btn" id="user-btn">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="user-name">Admin</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="user-dropdown">
+                        <a href="#profile"><i class="fas fa-user"></i> Profil</a>
+                        <a href="#settings"><i class="fas fa-cog"></i> Ayarlar</a>
+                        <hr>
+                        <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Page Content -->
+        <div class="page-content">
+            <!-- Dashboard Page -->
+            <section class="page dashboard-section active" id="dashboard-page">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                    <p>Hoş geldiniz! Site yönetim panelinize genel bakış.</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="total-blogs">0</span>
+                            <span class="stat-label">Blog Yazısı</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="published-blogs">0</span>
+                            <span class="stat-label">Yayında</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="draft-blogs">0</span>
+                            <span class="stat-label">Taslak</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-number" id="total-views">0</span>
+                            <span class="stat-label">Görüntülenme</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="dashboard-card recent-posts">
+                        <div class="card-header">
+                            <h3><i class="fas fa-clock"></i> Son Yazılar</h3>
+                            <a href="#blogs" class="view-all">Tümünü Gör</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="recent-posts-list" id="recent-posts-list">
+                                <!-- Dinamik olarak doldurulacak -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card quick-actions">
+                        <div class="card-header">
+                            <h3><i class="fas fa-bolt"></i> Hızlı İşlemler</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="quick-actions-grid">
+                                <button class="quick-action-btn" data-action="new-blog">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Yeni Yazı</span>
+                                </button>
+                                <button class="quick-action-btn" data-action="pages">
+                                    <i class="fas fa-edit"></i>
+                                    <span>Sayfa Düzenle</span>
+                                </button>
+                                <button class="quick-action-btn" data-action="media">
+                                    <i class="fas fa-images"></i>
+                                    <span>Medya</span>
+                                </button>
+                                <button class="quick-action-btn" data-action="view-site">
+                                    <i class="fas fa-globe"></i>
+                                    <span>Siteyi Gör</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Blogs Page -->
+            <section class="page blogs-section" id="blogs-page">
+                <div class="page-header">
+                    <h1>Blog Yazıları</h1>
+                    <button class="btn btn-primary" id="add-blog-btn">
+                        <i class="fas fa-plus"></i>
+                        Yeni Yazı Ekle
+                    </button>
+                </div>
+                
+                <div class="filter-bar">
+                    <div class="filter-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="blog-search" placeholder="Yazı ara...">
+                    </div>
+                    <div class="filter-options">
+                        <select id="filter-category">
+                            <option value="">Tüm Kategoriler</option>
+                            <option value="migren">Migren</option>
+                            <option value="alzheimer">Alzheimer</option>
+                            <option value="parkinson">Parkinson</option>
+                            <option value="epilepsi">Epilepsi</option>
+                            <option value="inme">İnme</option>
+                            <option value="uyku">Uyku</option>
+                            <option value="genel">Genel</option>
+                        </select>
+                        <select id="filter-status">
+                            <option value="">Tüm Durumlar</option>
+                            <option value="published">Yayında</option>
+                            <option value="draft">Taslak</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="blogs-table-wrapper">
+                    <table class="blogs-table">
+                        <thead>
+                            <tr>
+                                <th>Başlık</th>
+                                <th>Kategori</th>
+                                <th>Durum</th>
+                                <th>Tarih</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody id="blogs-table-body">
+                            <!-- Dinamik olarak doldurulacak -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="empty-state" id="blogs-empty">
+                    <i class="fas fa-newspaper"></i>
+                    <h3>Henüz blog yazısı yok</h3>
+                    <p>İlk blog yazınızı oluşturmak için "Yeni Yazı Ekle" butonuna tıklayın.</p>
+                </div>
+            </section>
+            
+            <!-- New/Edit Blog Page -->
+            <section class="page new-blog-section" id="new-blog-page">
+                <div class="page-header">
+                    <h1 id="blog-form-title">Yeni Blog Yazısı</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" id="save-draft-btn">
+                            <i class="fas fa-save"></i>
+                            Taslak Kaydet
+                        </button>
+                        <button class="btn btn-primary" id="publish-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Yayınla
+                        </button>
+                    </div>
+                </div>
+                
+                <form class="blog-form" id="blog-form">
+                    <input type="hidden" id="blog-id" value="">
+                    
+                    <div class="form-layout">
+                        <div class="form-main">
+                            <div class="form-group">
+                                <label for="blog-title">Başlık *</label>
+                                <input type="text" id="blog-title" name="title" placeholder="Yazı başlığını girin" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="blog-excerpt">Özet</label>
+                                <textarea id="blog-excerpt" name="excerpt" rows="3" placeholder="Yazının kısa özetini girin (liste görünümünde gösterilir)"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="blog-content">İçerik *</label>
+                                <div class="editor-toolbar">
+                                    <button type="button" data-command="bold" title="Kalın"><i class="fas fa-bold"></i></button>
+                                    <button type="button" data-command="italic" title="İtalik"><i class="fas fa-italic"></i></button>
+                                    <button type="button" data-command="underline" title="Altı Çizili"><i class="fas fa-underline"></i></button>
+                                    <span class="separator"></span>
+                                    <button type="button" data-command="insertUnorderedList" title="Liste"><i class="fas fa-list-ul"></i></button>
+                                    <button type="button" data-command="insertOrderedList" title="Numaralı Liste"><i class="fas fa-list-ol"></i></button>
+                                    <span class="separator"></span>
+                                    <button type="button" data-command="createLink" title="Link Ekle"><i class="fas fa-link"></i></button>
+                                    <button type="button" data-command="insertImage" title="Resim Ekle"><i class="fas fa-image"></i></button>
+                                    <span class="separator"></span>
+                                    <button type="button" data-command="formatBlock-h2" title="Başlık 2"><i class="fas fa-heading"></i>2</button>
+                                    <button type="button" data-command="formatBlock-h3" title="Başlık 3"><i class="fas fa-heading"></i>3</button>
+                                    <button type="button" data-command="formatBlock-p" title="Paragraf"><i class="fas fa-paragraph"></i></button>
+                                </div>
+                                <div class="editor-content" id="blog-content" contenteditable="true" placeholder="Yazı içeriğini buraya yazın..."></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-sidebar">
+                            <div class="sidebar-card">
+                                <h4>Yayın Ayarları</h4>
+                                
+                                <div class="form-group">
+                                    <label for="blog-category">Kategori *</label>
+                                    <select id="blog-category" name="category" required>
+                                        <option value="">Kategori Seçin</option>
+                                        <option value="migren">Migren</option>
+                                        <option value="alzheimer">Alzheimer</option>
+                                        <option value="parkinson">Parkinson</option>
+                                        <option value="epilepsi">Epilepsi</option>
+                                        <option value="inme">İnme</option>
+                                        <option value="uyku">Uyku</option>
+                                        <option value="genel">Genel</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="blog-date">Yayın Tarihi</label>
+                                    <input type="date" id="blog-date" name="date">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="blog-read-time">Okuma Süresi (dk)</label>
+                                    <input type="number" id="blog-read-time" name="readTime" min="1" max="60" value="5">
+                                </div>
+                            </div>
+                            
+                            <div class="sidebar-card">
+                                <h4>Öne Çıkan Görsel</h4>
+                                <div class="featured-image-upload" id="featured-image-upload">
+                                    <div class="upload-placeholder" id="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>Görsel yüklemek için tıklayın</span>
+                                        <small>veya sürükleyip bırakın</small>
+                                    </div>
+                                    <img id="featured-image-preview" src="" alt="Önizleme" style="display: none;">
+                                    <input type="file" id="featured-image-input" accept="image/*" hidden>
+                                    <button type="button" class="remove-image" id="remove-image" style="display: none;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="sidebar-card">
+                                <h4>SEO Ayarları</h4>
+                                
+                                <div class="form-group">
+                                    <label for="blog-meta-title">Meta Başlık</label>
+                                    <input type="text" id="blog-meta-title" name="metaTitle" placeholder="SEO başlığı">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="blog-meta-desc">Meta Açıklama</label>
+                                    <textarea id="blog-meta-desc" name="metaDesc" rows="2" placeholder="SEO açıklaması"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </section>
+            
+            <!-- Pages Content Management -->
+            <section class="page pages-section" id="pages-page">
+                <div class="page-header">
+                    <h1>Sayfa İçerikleri</h1>
+                    <p>Site bölümlerinin içeriklerini düzenleyin.</p>
+                </div>
+                
+                <div class="pages-tabs">
+                    <button class="tab-btn active" data-tab="hero">Hero Bölümü</button>
+                    <button class="tab-btn" data-tab="about">Hakkımda</button>
+                    <button class="tab-btn" data-tab="contact-info">İletişim Bilgileri</button>
+                    <button class="tab-btn" data-tab="social">Sosyal Medya</button>
+                </div>
+                
+                <!-- Hero Tab -->
+                <div class="tab-content active" id="hero-tab">
+                    <form class="content-form" id="hero-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Küçük Başlık</label>
+                                <input type="text" id="hero-subtitle" placeholder="Ör: Nöroloji Uzmanı">
+                            </div>
+                            <div class="form-group">
+                                <label>Ana Başlık</label>
+                                <input type="text" id="hero-title" placeholder="Ör: Prof. Dr. Ahmet Turan Evlice">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Açıklama Metni</label>
+                            <textarea id="hero-description" rows="3" placeholder="Hero bölümündeki açıklama metni"></textarea>
+                        </div>
+                        <div class="form-row thirds">
+                            <div class="form-group">
+                                <label>İstatistik 1 - Sayı</label>
+                                <input type="number" id="hero-stat1-number" placeholder="30">
+                            </div>
+                            <div class="form-group">
+                                <label>İstatistik 1 - Etiket</label>
+                                <input type="text" id="hero-stat1-label" placeholder="Yıllık Deneyim">
+                            </div>
+                        </div>
+                        <div class="form-row thirds">
+                            <div class="form-group">
+                                <label>İstatistik 2 - Sayı</label>
+                                <input type="number" id="hero-stat2-number" placeholder="50000">
+                            </div>
+                            <div class="form-group">
+                                <label>İstatistik 2 - Etiket</label>
+                                <input type="text" id="hero-stat2-label" placeholder="Mutlu Hasta">
+                            </div>
+                        </div>
+                        <div class="form-row thirds">
+                            <div class="form-group">
+                                <label>İstatistik 3 - Sayı</label>
+                                <input type="number" id="hero-stat3-number" placeholder="200">
+                            </div>
+                            <div class="form-group">
+                                <label>İstatistik 3 - Etiket</label>
+                                <input type="text" id="hero-stat3-label" placeholder="Bilimsel Yayın">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Doktor Fotoğrafı</label>
+                            <div class="image-upload-area" id="hero-image-upload">
+                                <div class="upload-preview" id="hero-image-preview">
+                                    <i class="fas fa-user-md"></i>
+                                    <span>Fotoğraf yüklemek için tıklayın</span>
+                                </div>
+                                <input type="file" id="hero-image-input" accept="image/*" hidden>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Değişiklikleri Kaydet
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- About Tab -->
+                <div class="tab-content" id="about-tab">
+                    <form class="content-form" id="about-form">
+                        <div class="form-group">
+                            <label>Bölüm Başlığı</label>
+                            <input type="text" id="about-title" placeholder="Ör: Tanışalım">
+                        </div>
+                        <div class="form-group">
+                            <label>Paragraf 1</label>
+                            <textarea id="about-text1" rows="4" placeholder="İlk paragraf metni"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Paragraf 2</label>
+                            <textarea id="about-text2" rows="4" placeholder="İkinci paragraf metni"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Hakkımda Fotoğrafı</label>
+                            <div class="image-upload-area" id="about-image-upload">
+                                <div class="upload-preview" id="about-image-preview">
+                                    <i class="fas fa-user-md"></i>
+                                    <span>Fotoğraf yüklemek için tıklayın</span>
+                                </div>
+                                <input type="file" id="about-image-input" accept="image/*" hidden>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Değişiklikleri Kaydet
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Contact Info Tab -->
+                <div class="tab-content" id="contact-info-tab">
+                    <form class="content-form" id="contact-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Telefon 1</label>
+                                <input type="tel" id="contact-phone1" placeholder="0500 123 45 67">
+                            </div>
+                            <div class="form-group">
+                                <label>Telefon 2</label>
+                                <input type="tel" id="contact-phone2" placeholder="0212 123 45 67">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>E-posta</label>
+                            <input type="email" id="contact-email" placeholder="info@ahmetevlice.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Adres</label>
+                            <textarea id="contact-address" rows="2" placeholder="Tam adres"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Çalışma Saatleri - Hafta İçi</label>
+                                <input type="text" id="contact-hours-weekday" placeholder="09:00 - 18:00">
+                            </div>
+                            <div class="form-group">
+                                <label>Çalışma Saatleri - Cumartesi</label>
+                                <input type="text" id="contact-hours-saturday" placeholder="09:00 - 14:00">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>WhatsApp Numarası</label>
+                            <input type="tel" id="contact-whatsapp" placeholder="905001234567">
+                        </div>
+                        <div class="form-group">
+                            <label>Google Maps Embed URL</label>
+                            <input type="url" id="contact-map" placeholder="Google Maps iframe URL">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Değişiklikleri Kaydet
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Social Media Tab -->
+                <div class="tab-content" id="social-tab">
+                    <form class="content-form" id="social-form">
+                        <div class="form-group">
+                            <label><i class="fab fa-facebook"></i> Facebook URL</label>
+                            <input type="url" id="social-facebook" placeholder="https://facebook.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fab fa-instagram"></i> Instagram URL</label>
+                            <input type="url" id="social-instagram" placeholder="https://instagram.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fab fa-youtube"></i> YouTube URL</label>
+                            <input type="url" id="social-youtube" placeholder="https://youtube.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fab fa-linkedin"></i> LinkedIn URL</label>
+                            <input type="url" id="social-linkedin" placeholder="https://linkedin.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fab fa-twitter"></i> Twitter/X URL</label>
+                            <input type="url" id="social-twitter" placeholder="https://twitter.com/...">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Değişiklikleri Kaydet
+                        </button>
+                    </form>
+                </div>
+            </section>
+            
+            <!-- Media Gallery Page -->
+            <section class="page media-section" id="media-page">
+                <div class="page-header">
+                    <h1>Medya Galerisi</h1>
+                    <button class="btn btn-primary" id="upload-media-btn">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Fotoğraf Yükle
+                    </button>
+                </div>
+                
+                <div class="media-upload-zone" id="media-upload-zone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Fotoğrafları buraya sürükleyin</h3>
+                    <p>veya yüklemek için tıklayın</p>
+                    <input type="file" id="media-file-input" accept="image/*" multiple hidden>
+                </div>
+                
+                <div class="media-filter">
+                    <span class="media-count"><span id="media-count">0</span> fotoğraf</span>
+                    <div class="media-view-toggle">
+                        <button class="view-btn active" data-view="grid"><i class="fas fa-th"></i></button>
+                        <button class="view-btn" data-view="list"><i class="fas fa-list"></i></button>
+                    </div>
+                </div>
+                
+                <div class="media-grid" id="media-grid">
+                    <!-- Dinamik olarak doldurulacak -->
+                </div>
+                
+                <div class="empty-state" id="media-empty">
+                    <i class="fas fa-images"></i>
+                    <h3>Henüz fotoğraf yok</h3>
+                    <p>İlk fotoğrafınızı yüklemek için yukarıdaki butonu kullanın.</p>
+                </div>
+            </section>
+            
+            <!-- Settings Page -->
+            <section class="page settings-section" id="settings-page">
+                <div class="page-header">
+                    <h1>Ayarlar</h1>
+                    <p>Site ve admin paneli ayarlarını yönetin.</p>
+                </div>
+                
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3><i class="fas fa-user-shield"></i> Giriş Bilgileri</h3>
+                        <form id="credentials-form">
+                            <div class="form-group">
+                                <label for="new-username">Yeni Kullanıcı Adı</label>
+                                <input type="text" id="new-username" placeholder="Yeni kullanıcı adı">
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password">Yeni Şifre</label>
+                                <input type="password" id="new-password" placeholder="Yeni şifre">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password">Şifre Tekrar</label>
+                                <input type="password" id="confirm-password" placeholder="Şifre tekrar">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Kaydet
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3><i class="fas fa-database"></i> Veri Yönetimi</h3>
+                        <p>Blog verilerini yedekleyin veya içe aktarın.</p>
+                        <div class="settings-actions">
+                            <button class="btn btn-outline" id="export-data">
+                                <i class="fas fa-download"></i>
+                                Verileri Dışa Aktar
+                            </button>
+                            <button class="btn btn-outline" id="import-data">
+                                <i class="fas fa-upload"></i>
+                                Verileri İçe Aktar
+                            </button>
+                            <input type="file" id="import-file" accept=".json" hidden>
+                        </div>
+                        <hr>
+                        <button class="btn btn-danger" id="clear-data">
+                            <i class="fas fa-trash"></i>
+                            Tüm Verileri Sil
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="delete-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Silme Onayı</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Bu yazıyı silmek istediğinizden emin misiniz?</p>
+                <p class="text-muted">Bu işlem geri alınamaz.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-delete">İptal</button>
+                <button class="btn btn-danger" id="confirm-delete">Sil</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="toast-icon"></i>
+        <span class="toast-message"></span>
+    </div>
+    
+    <script src="admin.js"></script>
+</body>
+</html>
+
