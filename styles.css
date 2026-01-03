@@ -720,6 +720,58 @@ ul {
     border-bottom-color: rgba(255, 255, 255, 0.05);
 }
 
+[data-theme="dark"] .footer-logo .logo-name {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .footer-logo .logo-text {
+    color: var(--accent);
+}
+
+[data-theme="dark"] .footer-description {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .footer-links h4,
+[data-theme="dark"] .footer-contact h4 {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .footer-links ul li a {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .footer-links ul li a:hover {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .footer-contact li span,
+[data-theme="dark"] .footer-contact li a {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .footer-social a {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .footer-social a:hover {
+    background: var(--accent);
+    color: var(--black);
+}
+
+[data-theme="dark"] .footer-bottom p {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .section-subtitle {
+    color: var(--accent);
+}
+
+[data-theme="dark"] .section-description {
+    color: rgba(255, 255, 255, 0.7);
+}
+
 /* WhatsApp & Back to Top Dark */
 [data-theme="dark"] .back-to-top {
     background: var(--gradient-accent);
