@@ -2133,6 +2133,10 @@ ul {
         --section-padding: 70px 0;
     }
     
+    .hero-scroll {
+        display: none;
+    }
+    
     .hero-title .title-main {
         font-size: 36px;
     }
