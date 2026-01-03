@@ -905,11 +905,19 @@ ul {
     color: var(--accent);
 }
 
+.stat-icon {
+    display: block;
+    font-size: 32px;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
 .stat-label {
     display: block;
     font-size: 13px;
     color: var(--gray);
     margin-top: 5px;
+    line-height: 1.4;
 }
 
 .stat-divider {
