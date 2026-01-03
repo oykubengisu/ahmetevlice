@@ -2130,16 +2130,74 @@ ul {
 
 @media screen and (max-width: 768px) {
     :root {
-        --section-padding: 70px 0;
+        --section-padding: 60px 0;
+    }
+    
+    /* Header Mobile */
+    .header {
+        height: 70px;
+    }
+    
+    .nav-logo {
+        gap: 2px;
+    }
+    
+    .nav-logo .logo-text {
+        font-size: 10px;
+    }
+    
+    .nav-logo .logo-name {
+        font-size: 14px;
+    }
+    
+    .nav-logo .logo-title {
+        font-size: 9px;
+    }
+    
+    /* Hero Mobile */
+    .hero {
+        padding-top: 90px;
+        min-height: auto;
+    }
+    
+    .hero-content {
+        padding: 20px 0 40px;
+    }
+    
+    .hero-title .title-small {
+        font-size: 12px;
+        letter-spacing: 2px;
     }
     
     .hero-title .title-main {
-        font-size: 36px;
+        font-size: 32px;
     }
     
+    .hero-description {
+        font-size: 15px;
+        line-height: 1.7;
+    }
+    
+    .hero-image {
+        max-width: 280px;
+        margin: 0 auto 30px;
+    }
+    
+    .image-wrapper {
+        height: 320px;
+    }
+    
+    .hero-photo {
+        border-radius: 16px;
+    }
+    
+    /* Stats Mobile */
     .hero-stats {
-        flex-wrap: wrap;
-        gap: 20px;
+        flex-direction: column;
+        gap: 15px;
+        padding: 20px;
+        background: var(--bg-secondary);
+        border-radius: 16px;
     }
     
     .stat-divider {
@@ -2147,33 +2205,175 @@ ul {
     }
     
     .stat-item {
-        flex: 1;
-        min-width: 100px;
+        flex: none;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        text-align: left;
     }
     
-    .section-title {
+    .stat-number {
         font-size: 32px;
     }
     
+    .stat-icon {
+        font-size: 24px;
+        margin-bottom: 0;
+    }
+    
+    .stat-label {
+        font-size: 13px;
+        margin-top: 0;
+    }
+    
+    /* Section Titles Mobile */
+    .section-title {
+        font-size: 28px;
+    }
+    
+    .section-subtitle {
+        font-size: 11px;
+    }
+    
+    .section-description {
+        font-size: 14px;
+    }
+    
+    /* About Mobile */
+    .about-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .about-image {
+        max-width: 280px;
+        margin: 0 auto;
+    }
+    
+    .image-frame {
+        max-width: 100%;
+    }
+    
+    .about-photo {
+        border-radius: 16px;
+    }
+    
+    .experience-badge {
+        width: 90px;
+        height: 90px;
+        bottom: -10px;
+        right: -10px;
+    }
+    
+    .exp-number {
+        font-size: 28px;
+    }
+    
+    .exp-text {
+        font-size: 10px;
+    }
+    
+    .about-text {
+        font-size: 14px;
+    }
+    
+    .about-features {
+        gap: 15px;
+    }
+    
+    .feature-item {
+        padding: 15px;
+    }
+    
+    .feature-item i {
+        font-size: 20px;
+        width: 45px;
+        height: 45px;
+    }
+    
+    .feature-item h4 {
+        font-size: 14px;
+    }
+    
+    .feature-item p {
+        font-size: 12px;
+    }
+    
+    /* Expertise Mobile */
     .expertise-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
     }
     
-    .gallery-grid {
+    .expertise-card {
+        padding: 25px 20px;
+    }
+    
+    .expertise-icon {
+        width: 55px;
+        height: 55px;
+        font-size: 22px;
+    }
+    
+    .expertise-card h3 {
+        font-size: 18px;
+    }
+    
+    .expertise-card p {
+        font-size: 13px;
+    }
+    
+    /* Contact Mobile */
+    .contact-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
     }
     
-    .gallery-item.large {
-        grid-column: auto;
+    .info-card {
+        padding: 20px;
+    }
+    
+    .info-icon {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .contact-form-wrapper {
+        padding: 25px 20px;
     }
     
     .form-row {
         grid-template-columns: 1fr;
     }
     
+    .contact-map iframe {
+        height: 300px;
+    }
+    
+    /* Media Section Mobile */
+    .media-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .media-stat-item {
+        padding: 15px 20px;
+    }
+    
+    .media-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Footer Mobile */
     .footer-content {
         grid-template-columns: 1fr;
         text-align: center;
+        gap: 30px;
+    }
+    
+    .footer-brand {
+        align-items: center;
     }
     
     .footer-links h4::after,
@@ -2190,6 +2390,13 @@ ul {
         justify-content: center;
     }
     
+    .footer-bottom {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    /* WhatsApp Button Mobile */
     .whatsapp-btn span {
         display: none;
     }
@@ -2197,28 +2404,228 @@ ul {
     .whatsapp-btn {
         padding: 15px;
         border-radius: 50%;
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    /* Gallery Mobile */
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .gallery-item.large {
+        grid-column: auto;
     }
 }
 
 @media screen and (max-width: 480px) {
+    :root {
+        --section-padding: 50px 0;
+    }
+    
+    .container {
+        padding: 0 15px;
+    }
+    
+    /* Header Extra Small */
+    .header {
+        height: 65px;
+    }
+    
+    .nav-logo .logo-name {
+        font-size: 13px;
+    }
+    
+    .nav-actions {
+        gap: 8px;
+    }
+    
+    .nav-phone,
+    .nav-toggle {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .theme-toggle {
+        width: 36px;
+        height: 36px;
+    }
+    
+    /* Hero Extra Small */
+    .hero {
+        padding-top: 80px;
+    }
+    
+    .hero-badge {
+        padding: 10px 18px;
+        font-size: 12px;
+    }
+    
+    .hero-badge i {
+        font-size: 16px;
+    }
+    
+    .hero-title .title-small {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+    }
+    
     .hero-title .title-main {
-        font-size: 28px;
+        font-size: 26px;
+    }
+    
+    .hero-description {
+        font-size: 14px;
+    }
+    
+    .hero-image {
+        max-width: 240px;
+    }
+    
+    .image-wrapper {
+        height: 280px;
     }
     
     .hero-buttons {
         flex-direction: column;
+        gap: 12px;
     }
     
     .btn {
         width: 100%;
+        padding: 14px 24px;
+        font-size: 14px;
+    }
+    
+    .hero-stats {
+        padding: 15px;
+    }
+    
+    .stat-number {
+        font-size: 28px;
+    }
+    
+    .stat-icon {
+        font-size: 22px;
+    }
+    
+    .stat-label {
+        font-size: 12px;
+    }
+    
+    /* Section Extra Small */
+    .section-title {
+        font-size: 24px;
+    }
+    
+    .section-description {
+        font-size: 13px;
+    }
+    
+    /* About Extra Small */
+    .about-image {
+        max-width: 240px;
+    }
+    
+    .experience-badge {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .exp-number {
+        font-size: 24px;
+    }
+    
+    .about-text {
+        font-size: 13px;
+    }
+    
+    .feature-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .feature-item > div {
+        text-align: center;
+    }
+    
+    /* Expertise Extra Small */
+    .expertise-card {
+        padding: 20px 15px;
+    }
+    
+    .expertise-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .expertise-card h3 {
+        font-size: 16px;
+    }
+    
+    /* Contact Extra Small */
+    .info-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .info-content {
+        text-align: center;
+    }
+    
+    .contact-form-wrapper {
+        padding: 20px 15px;
+    }
+    
+    .form-input,
+    .form-textarea {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+    
+    .contact-map iframe {
+        height: 250px;
+        border-radius: 12px;
+    }
+    
+    /* Media Extra Small */
+    .media-card-content {
+        padding: 15px;
+    }
+    
+    .media-title {
+        font-size: 14px;
+    }
+    
+    /* Footer Extra Small */
+    .footer {
+        padding: 40px 0 20px;
+    }
+    
+    .footer-logo .name {
+        font-size: 18px;
+    }
+    
+    .footer-description {
+        font-size: 13px;
+    }
+    
+    .footer-links ul li a,
+    .footer-contact li span,
+    .footer-contact li a {
+        font-size: 13px;
     }
     
     .clinic-features {
         grid-template-columns: 1fr;
     }
     
-    .contact-form-wrapper {
-        padding: 25px;
+    /* Scroll Down Hidden on Mobile */
+    .hero-scroll {
+        display: none;
     }
 }
 
