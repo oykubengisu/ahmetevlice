@@ -1599,6 +1599,16 @@ ul {
     gap: 25px;
 }
 
+.contact-cards-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    margin-bottom: 40px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .info-card {
     display: flex;
     align-items: flex-start;
@@ -2172,6 +2182,10 @@ ul {
     }
     
     .contact-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .contact-cards-row {
         grid-template-columns: 1fr;
     }
     
