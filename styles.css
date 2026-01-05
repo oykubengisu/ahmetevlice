@@ -2670,6 +2670,13 @@ ul {
     overflow: hidden;
     box-shadow: var(--shadow-sm);
     transition: var(--transition-normal);
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.media-card.clickable-card {
+    cursor: pointer;
 }
 
 .media-card:hover {
