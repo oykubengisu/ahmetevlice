@@ -375,6 +375,7 @@
 
     <script src="script.js"></script>
     <script>
+        const API_BASE_BLOG = 'https://ahmetevlice.onrender.com';
         // Kategori isimleri
         const categoryNames = {
             'alzheimer': 'Alzheimer',
@@ -417,36 +418,37 @@
             });
         }
 
-        function getBlogArticlesFromStorage() {
-            const raw = localStorage.getItem('blog_posts');
-            if (!raw) return [];
+        async function getBlogArticles() {
+            let blogs = [];
             try {
-                const blogs = JSON.parse(raw).filter(b => b.status === 'published');
-                return blogs.map((b, idx) => {
-                    const cfg = categoryConfig[b.category] || categoryConfig['genel'];
-                    return {
-                        id: b.id || idx,
-                        category: b.category || 'genel',
-                        title: b.title,
-                        excerpt: b.excerpt || b.title,
-                        date: formatBlogDate(b.date || b.createdAt),
-                        imageColor: cfg.color,
-                        icon: cfg.icon,
-                        pdfUrl: b.pdfUrl || '',
-                        pdfData: b.pdfData || null
-                    };
-                });
+                const r = await fetch(API_BASE_BLOG + '/api/blogs');
+                if (r.ok) blogs = await r.json();
+                else throw new Error();
             } catch (e) {
-                console.warn('Blog verileri okunamadı:', e);
-                return [];
+                const raw = localStorage.getItem('blog_posts');
+                if (raw) try { blogs = JSON.parse(raw); } catch (err) {}
             }
+            return blogs.filter(b => b.status === 'published').map((b, idx) => {
+                const cfg = categoryConfig[b.category] || categoryConfig['genel'];
+                return {
+                    id: b.id || idx,
+                    category: b.category || 'genel',
+                    title: b.title,
+                    excerpt: b.excerpt || b.title,
+                    date: formatBlogDate(b.date || b.createdAt),
+                    imageColor: cfg.color,
+                    icon: cfg.icon,
+                    pdfUrl: b.pdfUrl || '',
+                    pdfData: b.pdfData || null
+                };
+            });
         }
 
         // Render articles
-        function renderArticles(category = 'all') {
+        async function renderArticles(category = 'all') {
             const grid = document.getElementById('blog-articles-grid');
             const noResults = document.getElementById('no-results');
-            const allArticles = getBlogArticlesFromStorage();
+            const allArticles = await getBlogArticles();
             
             const filteredArticles = category === 'all' 
                 ? allArticles 
@@ -492,26 +494,16 @@
         }
 
         // Filter buttons event listeners
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             const filterButtons = document.querySelectorAll('.filter-btn');
-            
             filterButtons.forEach(btn => {
                 btn.addEventListener('click', function() {
-                    // Remove active class from all buttons
                     filterButtons.forEach(b => b.classList.remove('active'));
-                    // Add active class to clicked button
                     this.classList.add('active');
-                    
-                    // Get category
-                    const category = this.getAttribute('data-category');
-                    
-                    // Render filtered articles
-                    renderArticles(category);
+                    renderArticles(this.getAttribute('data-category'));
                 });
             });
-            
-            // Initial render
-            renderArticles('all');
+            await renderArticles('all');
         });
 
         // Header scroll effect

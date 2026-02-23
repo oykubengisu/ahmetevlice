@@ -6,6 +6,8 @@
 // ========================================
 // Configuration
 // ========================================
+const API_BASE = 'https://ahmetevlice.onrender.com';
+
 const CONFIG = {
     defaultUsername: 'admin',
     defaultPassword: 'admin123',
@@ -72,73 +74,79 @@ function getCategoryLabel(category) {
 }
 
 // ========================================
-// Storage Functions
+// Storage / API Functions
 // ========================================
-function getBlogs() {
-    const data = localStorage.getItem(CONFIG.storageKeys.blogs);
-    return data ? JSON.parse(data) : [];
+async function getBlogs() {
+    try {
+        const r = await fetch(API_BASE + '/api/blogs');
+        if (!r.ok) throw new Error();
+        return await r.json();
+    } catch (e) {
+        const data = localStorage.getItem(CONFIG.storageKeys.blogs);
+        return data ? JSON.parse(data) : [];
+    }
 }
 
-function saveBlogs(blogs) {
+function saveBlogsToLocal(blogs) {
     try {
         localStorage.setItem(CONFIG.storageKeys.blogs, JSON.stringify(blogs));
     } catch (e) {
-        // Storage quota dolduysa PDF verilerini temizleyip tekrar dene
         if (e.name === 'QuotaExceededError' || e.code === 22) {
-            console.warn('Storage quota exceeded. Trying without PDF data...');
-            const slimBlogs = blogs.map(b => ({
-                ...b,
-                pdfData: null,
-                pdfName: '',
-                pdfSize: ''
-            }));
+            const slimBlogs = blogs.map(b => ({ ...b, pdfData: null, pdfName: '', pdfSize: '' }));
             try {
                 localStorage.setItem(CONFIG.storageKeys.blogs, JSON.stringify(slimBlogs));
                 showToast('Depolama sınırı aşıldı. PDF içerikleri kaldırılarak kaydedildi.', 'error');
             } catch (err) {
-                console.error('Could not save blogs even after removing PDFs', err);
-                showToast('Depolama sınırı aşıldı. Bazı eski yazıları silmeniz gerekiyor.', 'error');
-                return;
+                showToast('Depolama sınırı aşıldı.', 'error');
             }
         } else {
-            console.error('Error saving blogs', e);
             showToast('Blog verileri kaydedilemedi.', 'error');
-            return;
         }
-    }
-    // Ana sayfadaki blog bölümünü de güncelle
-    if (window.updateMainPageBlogs) {
-        window.updateMainPageBlogs();
     }
 }
 
-function getBlog(id) {
-    const blogs = getBlogs();
+async function getBlog(id) {
+    const blogs = await getBlogs();
     return blogs.find(blog => blog.id === id);
 }
 
-function saveBlog(blog) {
-    const blogs = getBlogs();
-    const existingIndex = blogs.findIndex(b => b.id === blog.id);
-    
-    if (existingIndex > -1) {
-        blogs[existingIndex] = { ...blogs[existingIndex], ...blog, updatedAt: new Date().toISOString() };
-    } else {
-        blog.id = generateId();
-        blog.createdAt = new Date().toISOString();
-        blog.updatedAt = new Date().toISOString();
-        blog.views = 0;
-        blogs.unshift(blog);
+async function saveBlog(blog) {
+    try {
+        const res = await fetch(API_BASE + '/api/blogs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(blog)
+        });
+        if (!res.ok) throw new Error();
+        if (window.updateMainPageBlogs) window.updateMainPageBlogs();
+        return blog;
+    } catch (e) {
+        const blogs = await getBlogs();
+        const existingIndex = blogs.findIndex(b => b.id === blog.id);
+        if (existingIndex > -1) {
+            blogs[existingIndex] = { ...blogs[existingIndex], ...blog, updatedAt: new Date().toISOString() };
+        } else {
+            blog.id = blog.id || generateId();
+            blog.createdAt = blog.createdAt || new Date().toISOString();
+            blog.updatedAt = new Date().toISOString();
+            blog.views = blog.views || 0;
+            blogs.unshift(blog);
+        }
+        saveBlogsToLocal(blogs);
+        if (window.updateMainPageBlogs) window.updateMainPageBlogs();
+        return blog;
     }
-    
-    saveBlogs(blogs);
-    return blog;
 }
 
-function deleteBlog(id) {
-    const blogs = getBlogs();
-    const filtered = blogs.filter(blog => blog.id !== id);
-    saveBlogs(filtered);
+async function deleteBlog(id) {
+    try {
+        const res = await fetch(API_BASE + '/api/blogs/' + encodeURIComponent(id), { method: 'DELETE' });
+        if (!res.ok) throw new Error();
+    } catch (e) {
+        const blogs = await getBlogs();
+        const filtered = blogs.filter(blog => blog.id !== id);
+        saveBlogsToLocal(filtered);
+    }
 }
 
 function getCredentials() {
@@ -344,14 +352,12 @@ function initUserDropdown() {
 }
 
 // Dashboard Stats
-function initDashboardStats() {
-    const blogs = getBlogs();
-    
+async function initDashboardStats() {
+    const blogs = await getBlogs();
     const totalBlogs = document.getElementById('total-blogs');
     const publishedBlogs = document.getElementById('published-blogs');
     const draftBlogs = document.getElementById('draft-blogs');
     const totalViews = document.getElementById('total-views');
-    
     if (totalBlogs) totalBlogs.textContent = blogs.length;
     if (publishedBlogs) publishedBlogs.textContent = blogs.filter(b => b.status === 'published').length;
     if (draftBlogs) draftBlogs.textContent = blogs.filter(b => b.status === 'draft').length;
@@ -359,22 +365,17 @@ function initDashboardStats() {
 }
 
 // Recent Posts
-function initRecentPosts() {
+async function initRecentPosts() {
     const container = document.getElementById('recent-posts-list');
     if (!container) return;
-    
-    const blogs = getBlogs().slice(0, 5);
-    
+    const blogs = (await getBlogs()).slice(0, 5);
     if (blogs.length === 0) {
         container.innerHTML = '<p class="text-muted" style="text-align: center; padding: 20px;">Henüz yazı yok</p>';
         return;
     }
-    
     container.innerHTML = blogs.map(blog => `
         <div class="recent-post-item">
-            <div class="post-icon">
-                <i class="fas fa-newspaper"></i>
-            </div>
+            <div class="post-icon"><i class="fas fa-newspaper"></i></div>
             <div class="post-info">
                 <div class="post-title">${blog.title}</div>
                 <div class="post-meta">${formatDate(blog.date || blog.createdAt)}</div>
@@ -443,39 +444,25 @@ function initBlogsPage() {
     renderBlogsTable();
 }
 
-function renderBlogsTable() {
+async function renderBlogsTable() {
     const tbody = document.getElementById('blogs-table-body');
     const emptyState = document.getElementById('blogs-empty');
     const tableWrapper = document.querySelector('.blogs-table-wrapper');
-    
     if (!tbody) return;
-    
-    let blogs = getBlogs();
-    
-    // Apply filters
+    let blogs = await getBlogs();
     const searchTerm = document.getElementById('blog-search')?.value.toLowerCase() || '';
     const categoryFilter = document.getElementById('filter-category')?.value || '';
     const statusFilter = document.getElementById('filter-status')?.value || '';
-    
-    if (searchTerm) {
-        blogs = blogs.filter(b => b.title.toLowerCase().includes(searchTerm));
-    }
-    if (categoryFilter) {
-        blogs = blogs.filter(b => b.category === categoryFilter);
-    }
-    if (statusFilter) {
-        blogs = blogs.filter(b => b.status === statusFilter);
-    }
-    
+    if (searchTerm) blogs = blogs.filter(b => b.title.toLowerCase().includes(searchTerm));
+    if (categoryFilter) blogs = blogs.filter(b => b.category === categoryFilter);
+    if (statusFilter) blogs = blogs.filter(b => b.status === statusFilter);
     if (blogs.length === 0) {
         tableWrapper.style.display = 'none';
         emptyState.style.display = 'block';
         return;
     }
-    
     tableWrapper.style.display = 'block';
     emptyState.style.display = 'none';
-    
     tbody.innerHTML = blogs.map(blog => `
         <tr>
             <td class="blog-title-cell">${blog.title}</td>
@@ -637,7 +624,7 @@ function initEditor() {
     });
 }
 
-function saveBlogPost(status) {
+async function saveBlogPost(status) {
     const id = document.getElementById('blog-id').value;
     const title = document.getElementById('blog-title').value;
     const excerpt = document.getElementById('blog-excerpt').value;
@@ -670,15 +657,11 @@ function saveBlogPost(status) {
         status
     };
     
-    saveBlog(blog);
+    await saveBlog(blog);
     showToast(status === 'published' ? 'Yazı yayınlandı!' : 'Taslak kaydedildi!', 'success');
-    
-    // Update stats and tables
     initDashboardStats();
     initRecentPosts();
     renderBlogsTable();
-    
-    // Go to blogs list
     setTimeout(() => {
         window.location.hash = 'blogs';
         resetBlogForm();
@@ -721,8 +704,8 @@ function resetBlogForm() {
     if (pdfUrlInput) pdfUrlInput.value = '';
 }
 
-window.editBlog = function(id) {
-    const blog = getBlog(id);
+window.editBlog = async function(id) {
+    const blog = await getBlog(id);
     if (!blog) return;
     
     document.getElementById('blog-id').value = blog.id;
@@ -792,9 +775,9 @@ function initDeleteModal() {
     }
     
     if (confirmBtn) {
-        confirmBtn.addEventListener('click', () => {
+        confirmBtn.addEventListener('click', async () => {
             if (blogToDelete) {
-                deleteBlog(blogToDelete);
+                await deleteBlog(blogToDelete);
                 showToast('Yazı silindi!', 'success');
                 initDashboardStats();
                 initRecentPosts();
@@ -845,58 +828,76 @@ function initPagesTabs() {
     });
 }
 
-function loadPageContent() {
-    // Load Hero content
-    const heroContent = JSON.parse(localStorage.getItem('page_hero') || '{}');
-    if (heroContent.subtitle) document.getElementById('hero-subtitle').value = heroContent.subtitle;
-    if (heroContent.title) document.getElementById('hero-title').value = heroContent.title;
-    if (heroContent.description) document.getElementById('hero-description').value = heroContent.description;
-    if (heroContent.stat1Number) document.getElementById('hero-stat1-number').value = heroContent.stat1Number;
-    if (heroContent.stat1Label) document.getElementById('hero-stat1-label').value = heroContent.stat1Label;
-    if (heroContent.stat2Number) document.getElementById('hero-stat2-number').value = heroContent.stat2Number;
-    if (heroContent.stat2Label) document.getElementById('hero-stat2-label').value = heroContent.stat2Label;
-    if (heroContent.stat3Number) document.getElementById('hero-stat3-number').value = heroContent.stat3Number;
-    if (heroContent.stat3Label) document.getElementById('hero-stat3-label').value = heroContent.stat3Label;
-    if (heroContent.image) {
-        const preview = document.getElementById('hero-image-preview');
-        preview.innerHTML = `<img src="${heroContent.image}" alt="Hero">`;
+async function loadPageContent() {
+    const pageKeys = ['hero', 'about', 'contact', 'social'];
+    const fallback = (key) => JSON.parse(localStorage.getItem('page_' + key) || '{}');
+    for (const key of pageKeys) {
+        let content = {};
+        try {
+            const r = await fetch(API_BASE + '/api/pages/' + key);
+            if (r.ok) content = await r.json();
+            else content = fallback(key);
+        } catch (e) {
+            content = fallback(key);
+        }
+        if (key === 'hero') {
+            if (content.subtitle) document.getElementById('hero-subtitle').value = content.subtitle;
+            if (content.title) document.getElementById('hero-title').value = content.title;
+            if (content.description) document.getElementById('hero-description').value = content.description;
+            if (content.stat1Number) document.getElementById('hero-stat1-number').value = content.stat1Number;
+            if (content.stat1Label) document.getElementById('hero-stat1-label').value = content.stat1Label;
+            if (content.stat2Number) document.getElementById('hero-stat2-number').value = content.stat2Number;
+            if (content.stat2Label) document.getElementById('hero-stat2-label').value = content.stat2Label;
+            if (content.stat3Number) document.getElementById('hero-stat3-number').value = content.stat3Number;
+            if (content.stat3Label) document.getElementById('hero-stat3-label').value = content.stat3Label;
+            if (content.image) {
+                const preview = document.getElementById('hero-image-preview');
+                if (preview) preview.innerHTML = `<img src="${content.image}" alt="Hero">`;
+            }
+        } else if (key === 'about') {
+            if (content.title) document.getElementById('about-title').value = content.title;
+            if (content.text1) document.getElementById('about-text1').value = content.text1;
+            if (content.text2) document.getElementById('about-text2').value = content.text2;
+            if (content.image) {
+                const preview = document.getElementById('about-image-preview');
+                if (preview) preview.innerHTML = `<img src="${content.image}" alt="About">`;
+            }
+        } else if (key === 'contact') {
+            if (content.phone1) document.getElementById('contact-phone1').value = content.phone1;
+            if (content.phone2) document.getElementById('contact-phone2').value = content.phone2;
+            if (content.email) document.getElementById('contact-email').value = content.email;
+            if (content.address) document.getElementById('contact-address').value = content.address;
+            if (content.hoursWeekday) document.getElementById('contact-hours-weekday').value = content.hoursWeekday;
+            if (content.hoursSaturday) document.getElementById('contact-hours-saturday').value = content.hoursSaturday;
+            if (content.whatsapp) document.getElementById('contact-whatsapp').value = content.whatsapp;
+            if (content.map) document.getElementById('contact-map').value = content.map;
+        } else if (key === 'social') {
+            if (content.facebook) document.getElementById('social-facebook').value = content.facebook;
+            if (content.instagram) document.getElementById('social-instagram').value = content.instagram;
+            if (content.youtube) document.getElementById('social-youtube').value = content.youtube;
+            if (content.linkedin) document.getElementById('social-linkedin').value = content.linkedin;
+            if (content.twitter) document.getElementById('social-twitter').value = content.twitter;
+        }
     }
-    
-    // Load About content
-    const aboutContent = JSON.parse(localStorage.getItem('page_about') || '{}');
-    if (aboutContent.title) document.getElementById('about-title').value = aboutContent.title;
-    if (aboutContent.text1) document.getElementById('about-text1').value = aboutContent.text1;
-    if (aboutContent.text2) document.getElementById('about-text2').value = aboutContent.text2;
-    if (aboutContent.image) {
-        const preview = document.getElementById('about-image-preview');
-        preview.innerHTML = `<img src="${aboutContent.image}" alt="About">`;
-    }
-    
-    // Load Contact content
-    const contactContent = JSON.parse(localStorage.getItem('page_contact') || '{}');
-    if (contactContent.phone1) document.getElementById('contact-phone1').value = contactContent.phone1;
-    if (contactContent.phone2) document.getElementById('contact-phone2').value = contactContent.phone2;
-    if (contactContent.email) document.getElementById('contact-email').value = contactContent.email;
-    if (contactContent.address) document.getElementById('contact-address').value = contactContent.address;
-    if (contactContent.hoursWeekday) document.getElementById('contact-hours-weekday').value = contactContent.hoursWeekday;
-    if (contactContent.hoursSaturday) document.getElementById('contact-hours-saturday').value = contactContent.hoursSaturday;
-    if (contactContent.whatsapp) document.getElementById('contact-whatsapp').value = contactContent.whatsapp;
-    if (contactContent.map) document.getElementById('contact-map').value = contactContent.map;
-    
-    // Load Social content
-    const socialContent = JSON.parse(localStorage.getItem('page_social') || '{}');
-    if (socialContent.facebook) document.getElementById('social-facebook').value = socialContent.facebook;
-    if (socialContent.instagram) document.getElementById('social-instagram').value = socialContent.instagram;
-    if (socialContent.youtube) document.getElementById('social-youtube').value = socialContent.youtube;
-    if (socialContent.linkedin) document.getElementById('social-linkedin').value = socialContent.linkedin;
-    if (socialContent.twitter) document.getElementById('social-twitter').value = socialContent.twitter;
 }
 
 function initPageForms() {
-    // Hero Form
+    async function savePage(key, payload) {
+        try {
+            const r = await fetch(API_BASE + '/api/pages/' + key, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!r.ok) throw new Error();
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
     const heroForm = document.getElementById('hero-form');
     if (heroForm) {
-        heroForm.addEventListener('submit', (e) => {
+        heroForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const heroContent = {
                 subtitle: document.getElementById('hero-subtitle').value,
@@ -910,15 +911,13 @@ function initPageForms() {
                 stat3Label: document.getElementById('hero-stat3-label').value,
                 image: document.querySelector('#hero-image-preview img')?.src || ''
             };
-            localStorage.setItem('page_hero', JSON.stringify(heroContent));
-            showToast('Hero bölümü kaydedildi!', 'success');
+            if (await savePage('hero', heroContent)) showToast('Hero bölümü kaydedildi!', 'success');
+            else { localStorage.setItem('page_hero', JSON.stringify(heroContent)); showToast('Kaydedildi (çevrimdışı).', 'success'); }
         });
     }
-    
-    // About Form
     const aboutForm = document.getElementById('about-form');
     if (aboutForm) {
-        aboutForm.addEventListener('submit', (e) => {
+        aboutForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const aboutContent = {
                 title: document.getElementById('about-title').value,
@@ -926,15 +925,13 @@ function initPageForms() {
                 text2: document.getElementById('about-text2').value,
                 image: document.querySelector('#about-image-preview img')?.src || ''
             };
-            localStorage.setItem('page_about', JSON.stringify(aboutContent));
-            showToast('Hakkımda bölümü kaydedildi!', 'success');
+            if (await savePage('about', aboutContent)) showToast('Hakkımda bölümü kaydedildi!', 'success');
+            else { localStorage.setItem('page_about', JSON.stringify(aboutContent)); showToast('Kaydedildi (çevrimdışı).', 'success'); }
         });
     }
-    
-    // Contact Form
     const contactForm = document.getElementById('contact-form');
     if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
+        contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const contactContent = {
                 phone1: document.getElementById('contact-phone1').value,
@@ -946,15 +943,13 @@ function initPageForms() {
                 whatsapp: document.getElementById('contact-whatsapp').value,
                 map: document.getElementById('contact-map').value
             };
-            localStorage.setItem('page_contact', JSON.stringify(contactContent));
-            showToast('İletişim bilgileri kaydedildi!', 'success');
+            if (await savePage('contact', contactContent)) showToast('İletişim bilgileri kaydedildi!', 'success');
+            else { localStorage.setItem('page_contact', JSON.stringify(contactContent)); showToast('Kaydedildi (çevrimdışı).', 'success'); }
         });
     }
-    
-    // Social Form
     const socialForm = document.getElementById('social-form');
     if (socialForm) {
-        socialForm.addEventListener('submit', (e) => {
+        socialForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const socialContent = {
                 facebook: document.getElementById('social-facebook').value,
@@ -963,8 +958,8 @@ function initPageForms() {
                 linkedin: document.getElementById('social-linkedin').value,
                 twitter: document.getElementById('social-twitter').value
             };
-            localStorage.setItem('page_social', JSON.stringify(socialContent));
-            showToast('Sosyal medya linkleri kaydedildi!', 'success');
+            if (await savePage('social', socialContent)) showToast('Sosyal medya linkleri kaydedildi!', 'success');
+            else { localStorage.setItem('page_social', JSON.stringify(socialContent)); showToast('Kaydedildi (çevrimdışı).', 'success'); }
         });
     }
 }
@@ -1060,28 +1055,46 @@ function initMediaGallery() {
     renderMediaGallery();
 }
 
+let mediaItemsCache = [];
+
+async function getMediaItems() {
+    try {
+        const r = await fetch(API_BASE + '/api/media');
+        if (!r.ok) throw new Error();
+        return await r.json();
+    } catch (e) {
+        const data = localStorage.getItem('media_gallery');
+        return data ? JSON.parse(data) : [];
+    }
+}
+
 function handleMediaUpload(files) {
-    const mediaItems = JSON.parse(localStorage.getItem('media_gallery') || '[]');
-    
     Array.from(files).forEach(file => {
-        if (file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const mediaItem = {
-                    id: generateId(),
-                    name: file.name,
-                    size: formatFileSize(file.size),
-                    type: file.type,
-                    data: e.target.result,
-                    uploadedAt: new Date().toISOString()
-                };
-                mediaItems.unshift(mediaItem);
-                localStorage.setItem('media_gallery', JSON.stringify(mediaItems));
-                renderMediaGallery();
-                showToast('Fotoğraf yüklendi!', 'success');
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            const mediaItem = {
+                name: file.name,
+                size: formatFileSize(file.size),
+                type: file.type,
+                data: e.target.result
             };
-            reader.readAsDataURL(file);
-        }
+            try {
+                const res = await fetch(API_BASE + '/api/media', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(mediaItem)
+                });
+                if (!res.ok) throw new Error();
+                showToast('Fotoğraf yüklendi!', 'success');
+            } catch (err) {
+                mediaItemsCache.unshift({ ...mediaItem, id: generateId(), uploadedAt: new Date().toISOString() });
+                localStorage.setItem('media_gallery', JSON.stringify(mediaItemsCache));
+                showToast('Yüklendi (çevrimdışı).', 'success');
+            }
+            renderMediaGallery();
+        };
+        reader.readAsDataURL(file);
     });
 }
 
@@ -1093,26 +1106,21 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-function renderMediaGallery() {
+async function renderMediaGallery() {
     const grid = document.getElementById('media-grid');
     const emptyState = document.getElementById('media-empty');
     const countEl = document.getElementById('media-count');
-    
     if (!grid) return;
-    
-    const mediaItems = JSON.parse(localStorage.getItem('media_gallery') || '[]');
-    
+    const mediaItems = await getMediaItems();
+    mediaItemsCache = mediaItems;
     if (countEl) countEl.textContent = mediaItems.length;
-    
     if (mediaItems.length === 0) {
         grid.style.display = 'none';
         emptyState.style.display = 'block';
         return;
     }
-    
     grid.style.display = 'grid';
     emptyState.style.display = 'none';
-    
     grid.innerHTML = mediaItems.map(item => `
         <div class="media-item" data-id="${item.id}">
             <img src="${item.data}" alt="${item.name}">
@@ -1135,23 +1143,24 @@ function renderMediaGallery() {
 }
 
 window.copyMediaUrl = function(id) {
-    const mediaItems = JSON.parse(localStorage.getItem('media_gallery') || '[]');
-    const item = mediaItems.find(m => m.id === id);
-    if (item) {
-        navigator.clipboard.writeText(item.data).then(() => {
-            showToast('URL kopyalandı!', 'success');
-        });
+    const item = mediaItemsCache.find(m => m.id === id);
+    if (item && item.data) {
+        navigator.clipboard.writeText(item.data).then(() => showToast('URL kopyalandı!', 'success'));
     }
 };
 
-window.deleteMedia = function(id) {
-    if (confirm('Bu fotoğrafı silmek istediğinizden emin misiniz?')) {
-        let mediaItems = JSON.parse(localStorage.getItem('media_gallery') || '[]');
-        mediaItems = mediaItems.filter(m => m.id !== id);
-        localStorage.setItem('media_gallery', JSON.stringify(mediaItems));
-        renderMediaGallery();
+window.deleteMedia = async function(id) {
+    if (!confirm('Bu fotoğrafı silmek istediğinizden emin misiniz?')) return;
+    try {
+        const r = await fetch(API_BASE + '/api/media/' + encodeURIComponent(id), { method: 'DELETE' });
+        if (!r.ok) throw new Error();
         showToast('Fotoğraf silindi!', 'success');
+    } catch (e) {
+        mediaItemsCache = mediaItemsCache.filter(m => m.id !== id);
+        localStorage.setItem('media_gallery', JSON.stringify(mediaItemsCache));
+        showToast('Silindi (çevrimdışı).', 'success');
     }
+    renderMediaGallery();
 };
 
 // ========================================
@@ -1196,20 +1205,15 @@ function initSettings() {
     
     // Export data
     if (exportBtn) {
-        exportBtn.addEventListener('click', () => {
-            const data = {
-                blogs: getBlogs(),
-                exportDate: new Date().toISOString()
-            };
-            
+        exportBtn.addEventListener('click', async () => {
+            const blogs = await getBlogs();
+            const data = { blogs, exportDate: new Date().toISOString() };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
-            
             const a = document.createElement('a');
             a.href = url;
             a.download = `blog-backup-${formatDateInput(new Date())}.json`;
             a.click();
-            
             URL.revokeObjectURL(url);
             showToast('Veriler dışa aktarıldı!', 'success');
         });
@@ -1224,11 +1228,13 @@ function initSettings() {
         importFile.addEventListener('change', function() {
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = async function(e) {
                     try {
                         const data = JSON.parse(e.target.result);
                         if (data.blogs && Array.isArray(data.blogs)) {
-                            saveBlogs(data.blogs);
+                            for (const blog of data.blogs) {
+                                await saveBlog(blog);
+                            }
                             initDashboardStats();
                             initRecentPosts();
                             renderBlogsTable();

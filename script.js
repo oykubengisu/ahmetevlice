@@ -514,20 +514,25 @@ if (yearElement) {
 
 console.log('Prof. Dr. Ahmet Evlice Website - Loaded Successfully');
 
+// API adresi (Render)
+const API_BASE = 'https://ahmetevlice.onrender.com';
+
 // ========================================
 // Dynamic Blog Section
 // ========================================
-function loadDynamicBlogs() {
+async function loadDynamicBlogs() {
     const blogGrid = document.querySelector('.blog-grid');
     if (!blogGrid) return;
-    
-    // Eğer "Daha Fazlası" kartı varsa, sonradan tekrar eklemek için sakla
     const moreCard = blogGrid.querySelector('.blog-more-card');
-    
-    // Get published blogs from localStorage (only first 2 for homepage)
-    const blogs = JSON.parse(localStorage.getItem('blog_posts') || '[]')
-        .filter(blog => blog.status === 'published')
-        .slice(0, 2);
+    let blogs = [];
+    try {
+        const r = await fetch(API_BASE + '/api/blogs');
+        if (r.ok) blogs = await r.json();
+        else throw new Error();
+    } catch (e) {
+        blogs = JSON.parse(localStorage.getItem('blog_posts') || '[]');
+    }
+    blogs = blogs.filter(blog => blog.status === 'published').slice(0, 2);
     
     // If no blogs in admin, sadece Daha Fazlası kartı kalsın
     if (blogs.length === 0) {
@@ -654,27 +659,22 @@ window.updateMainPageBlogs = function() {
 document.addEventListener('DOMContentLoaded', loadDynamicBlogs);
 
 // ========================================
-// Load Page Content from Admin Panel
+// Load Page Content from Admin Panel (API öncelikli)
 // ========================================
-document.addEventListener('DOMContentLoaded', function() {
-    loadHeroContent();
-    loadAboutContent();
-    loadContactContent();
-    loadSocialLinks();
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadHeroContent();
+    await loadAboutContent();
+    await loadContactContent();
+    await loadSocialLinks();
     initWhatsAppButton();
 });
 
 /**
- * Initialize WhatsApp Button
+ * Initialize WhatsApp Button (contact verisi loadContactContent sonrası DOM'da)
  */
 function initWhatsAppButton() {
     const whatsappBtn = document.getElementById('whatsapp-btn');
-    if (!whatsappBtn) {
-        console.log('WhatsApp button not found');
-        return;
-    }
-    
-    // Get WhatsApp number from localStorage
+    if (!whatsappBtn) return;
     const contactContent = JSON.parse(localStorage.getItem('page_contact') || '{}');
     
     if (contactContent.whatsapp && contactContent.whatsapp.trim() !== '') {
@@ -711,10 +711,18 @@ function initWhatsAppButton() {
 }
 
 /**
- * Load Hero Section Content
+ * Load Hero Section Content (API öncelikli)
  */
-function loadHeroContent() {
-    const heroContent = JSON.parse(localStorage.getItem('page_hero') || '{}');
+async function loadHeroContent() {
+    let heroContent = {};
+    try {
+        const r = await fetch(API_BASE + '/api/pages/hero');
+        if (r.ok) heroContent = await r.json();
+        else throw new Error();
+    } catch (e) {
+        heroContent = JSON.parse(localStorage.getItem('page_hero') || '{}');
+    }
+    if (Object.keys(heroContent).length) localStorage.setItem('page_hero', JSON.stringify(heroContent));
     
     // Update subtitle
     const subtitleEl = document.querySelector('.hero-title .title-small');
@@ -778,10 +786,18 @@ function loadHeroContent() {
 }
 
 /**
- * Load About Section Content
+ * Load About Section Content (API öncelikli)
  */
-function loadAboutContent() {
-    const aboutContent = JSON.parse(localStorage.getItem('page_about') || '{}');
+async function loadAboutContent() {
+    let aboutContent = {};
+    try {
+        const r = await fetch(API_BASE + '/api/pages/about');
+        if (r.ok) aboutContent = await r.json();
+        else throw new Error();
+    } catch (e) {
+        aboutContent = JSON.parse(localStorage.getItem('page_about') || '{}');
+    }
+    if (Object.keys(aboutContent).length) localStorage.setItem('page_about', JSON.stringify(aboutContent));
     
     // Update title
     const titleEl = document.querySelector('.about .section-title');
@@ -817,10 +833,18 @@ function loadAboutContent() {
 }
 
 /**
- * Load Contact Section Content
+ * Load Contact Section Content (API öncelikli)
  */
-function loadContactContent() {
-    const contactContent = JSON.parse(localStorage.getItem('page_contact') || '{}');
+async function loadContactContent() {
+    let contactContent = {};
+    try {
+        const r = await fetch(API_BASE + '/api/pages/contact');
+        if (r.ok) contactContent = await r.json();
+        else throw new Error();
+    } catch (e) {
+        contactContent = JSON.parse(localStorage.getItem('page_contact') || '{}');
+    }
+    if (Object.keys(contactContent).length) localStorage.setItem('page_contact', JSON.stringify(contactContent));
     
     // Update phone numbers in header
     const navPhone = document.querySelector('.nav-phone span');
@@ -922,10 +946,18 @@ function loadContactContent() {
 }
 
 /**
- * Load Social Media Links
+ * Load Social Media Links (API öncelikli)
  */
-function loadSocialLinks() {
-    const socialContent = JSON.parse(localStorage.getItem('page_social') || '{}');
+async function loadSocialLinks() {
+    let socialContent = {};
+    try {
+        const r = await fetch(API_BASE + '/api/pages/social');
+        if (r.ok) socialContent = await r.json();
+        else throw new Error();
+    } catch (e) {
+        socialContent = JSON.parse(localStorage.getItem('page_social') || '{}');
+    }
+    if (Object.keys(socialContent).length) localStorage.setItem('page_social', JSON.stringify(socialContent));
     
     // Header social links
     const headerSocial = document.querySelectorAll('.nav-social .social-link');
@@ -948,11 +980,12 @@ function loadSocialLinks() {
 /**
  * Refresh page content (can be called from admin panel)
  */
-window.refreshPageContent = function() {
-    loadHeroContent();
-    loadAboutContent();
-    loadContactContent();
-    loadSocialLinks();
-    loadDynamicBlogs();
+window.refreshPageContent = async function() {
+    await loadHeroContent();
+    await loadAboutContent();
+    await loadContactContent();
+    await loadSocialLinks();
+    await loadDynamicBlogs();
+    initWhatsAppButton();
 };
 
