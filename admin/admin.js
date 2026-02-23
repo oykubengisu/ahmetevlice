@@ -9,12 +9,9 @@
 const API_BASE = 'https://ahmetevlice.onrender.com';
 
 const CONFIG = {
-    defaultUsername: 'admin',
-    defaultPassword: 'admin123',
     storageKeys: {
-        auth: 'admin_auth',
-        blogs: 'blog_posts',
-        credentials: 'admin_credentials'
+        token: 'admin_token',
+        blogs: 'blog_posts'
     }
 };
 
@@ -114,9 +111,10 @@ async function saveBlog(blog) {
     try {
         const res = await fetch(API_BASE + '/api/blogs', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
             body: JSON.stringify(blog)
         });
+        if (res.status === 401) { logout(); return blog; }
         if (!res.ok) throw new Error();
         if (window.updateMainPageBlogs) window.updateMainPageBlogs();
         return blog;
@@ -140,7 +138,11 @@ async function saveBlog(blog) {
 
 async function deleteBlog(id) {
     try {
-        const res = await fetch(API_BASE + '/api/blogs/' + encodeURIComponent(id), { method: 'DELETE' });
+        const res = await fetch(API_BASE + '/api/blogs/' + encodeURIComponent(id), {
+            method: 'DELETE',
+            headers: getAuthHeader()
+        });
+        if (res.status === 401) { logout(); return; }
         if (!res.ok) throw new Error();
     } catch (e) {
         const blogs = await getBlogs();
@@ -149,36 +151,39 @@ async function deleteBlog(id) {
     }
 }
 
-function getCredentials() {
-    const data = localStorage.getItem(CONFIG.storageKeys.credentials);
-    return data ? JSON.parse(data) : {
-        username: CONFIG.defaultUsername,
-        password: CONFIG.defaultPassword
-    };
+// API isteklerinde kullanılacak auth header (yazma işlemleri için)
+function getAuthHeader() {
+    const token = sessionStorage.getItem(CONFIG.storageKeys.token);
+    return token ? { 'Authorization': 'Bearer ' + token } : {};
 }
 
-function saveCredentials(username, password) {
-    localStorage.setItem(CONFIG.storageKeys.credentials, JSON.stringify({ username, password }));
-}
-
-// ========================================
-// Auth Functions
-// ========================================
 function isLoggedIn() {
-    return sessionStorage.getItem(CONFIG.storageKeys.auth) === 'true';
+    return !!sessionStorage.getItem(CONFIG.storageKeys.token);
 }
 
-function login(username, password) {
-    const credentials = getCredentials();
-    if (username === credentials.username && password === credentials.password) {
-        sessionStorage.setItem(CONFIG.storageKeys.auth, 'true');
+async function login(username, password) {
+    const res = await fetch(API_BASE + '/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.token) {
+        sessionStorage.setItem(CONFIG.storageKeys.token, data.token);
         return true;
     }
     return false;
 }
 
 function logout() {
-    sessionStorage.removeItem(CONFIG.storageKeys.auth);
+    const token = sessionStorage.getItem(CONFIG.storageKeys.token);
+    if (token) {
+        fetch(API_BASE + '/api/auth/logout', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+        }).catch(() => {});
+    }
+    sessionStorage.removeItem(CONFIG.storageKeys.token);
     window.location.href = 'index.html';
 }
 
@@ -208,14 +213,18 @@ function initLoginPage() {
         });
     }
     
-    // Login form submit
-    loginForm.addEventListener('submit', function(e) {
+    // Login form submit (API üzerinden giriş)
+    loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
-        const username = document.getElementById('username').value;
+        const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
-        
-        if (login(username, password)) {
+        if (!username || !password) {
+            loginError.classList.add('show');
+            setTimeout(() => loginError.classList.remove('show'), 3000);
+            return;
+        }
+        const ok = await login(username, password);
+        if (ok) {
             window.location.href = 'dashboard.html';
         } else {
             loginError.classList.add('show');
@@ -227,13 +236,22 @@ function initLoginPage() {
 // ========================================
 // Dashboard Page
 // ========================================
-function initDashboardPage() {
-    // Check authentication
+async function initDashboardPage() {
     if (!isLoggedIn()) {
         window.location.href = 'index.html';
         return;
     }
-    
+    // Token geçerli mi kontrol et
+    try {
+        const r = await fetch(API_BASE + '/api/auth/me', { headers: getAuthHeader() });
+        if (r.status === 401) {
+            sessionStorage.removeItem(CONFIG.storageKeys.token);
+            window.location.href = 'index.html';
+            return;
+        }
+    } catch (e) {
+        // Ağ hatası; yine de devam et, yazma sırasında 401 alırsa çıkış yapar
+    }
     initSidebar();
     initNavigation();
     initUserDropdown();
@@ -886,9 +904,10 @@ function initPageForms() {
         try {
             const r = await fetch(API_BASE + '/api/pages/' + key, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
                 body: JSON.stringify(payload)
             });
+            if (r.status === 401) { logout(); return false; }
             if (!r.ok) throw new Error();
             return true;
         } catch (e) {
@@ -1082,9 +1101,10 @@ function handleMediaUpload(files) {
             try {
                 const res = await fetch(API_BASE + '/api/media', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
                     body: JSON.stringify(mediaItem)
                 });
+                if (res.status === 401) { logout(); return; }
                 if (!res.ok) throw new Error();
                 showToast('Fotoğraf yüklendi!', 'success');
             } catch (err) {
@@ -1152,7 +1172,11 @@ window.copyMediaUrl = function(id) {
 window.deleteMedia = async function(id) {
     if (!confirm('Bu fotoğrafı silmek istediğinizden emin misiniz?')) return;
     try {
-        const r = await fetch(API_BASE + '/api/media/' + encodeURIComponent(id), { method: 'DELETE' });
+        const r = await fetch(API_BASE + '/api/media/' + encodeURIComponent(id), {
+            method: 'DELETE',
+            headers: getAuthHeader()
+        });
+        if (r.status === 401) { logout(); return; }
         if (!r.ok) throw new Error();
         showToast('Fotoğraf silindi!', 'success');
     } catch (e) {
@@ -1173,34 +1197,9 @@ function initSettings() {
     const importFile = document.getElementById('import-file');
     const clearBtn = document.getElementById('clear-data');
     
-    // Change credentials
+    // Giriş bilgileri Render ortam değişkenlerinde yönetiliyor
     if (credentialsForm) {
-        credentialsForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const newUsername = document.getElementById('new-username').value;
-            const newPassword = document.getElementById('new-password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            
-            if (!newUsername && !newPassword) {
-                showToast('En az bir alan doldurun!', 'error');
-                return;
-            }
-            
-            if (newPassword && newPassword !== confirmPassword) {
-                showToast('Şifreler eşleşmiyor!', 'error');
-                return;
-            }
-            
-            const credentials = getCredentials();
-            saveCredentials(
-                newUsername || credentials.username,
-                newPassword || credentials.password
-            );
-            
-            showToast('Giriş bilgileri güncellendi!', 'success');
-            credentialsForm.reset();
-        });
+        credentialsForm.innerHTML = '<p class="text-muted" style="margin-bottom:12px;">Giriş, Render üzerindeki API ile doğrulanıyor. Kullanıcı adı ve şifreyi değiştirmek için Render Dashboard → Servisiniz → Environment bölümünde <strong>ADMIN_USERNAME</strong> ve <strong>ADMIN_PASSWORD_HASH</strong> ekleyin veya güncelleyin. Şifre hash\'i için proje klasöründe terminalde: <code>node -e "require(\'bcryptjs\').hash(\'YeniSifren\', 10).then(h=>console.log(h))"</code> çalıştırıp çıkan değeri ADMIN_PASSWORD_HASH olarak yapıştırın.</p>';
     }
     
     // Export data

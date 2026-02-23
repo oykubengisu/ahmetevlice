@@ -1,11 +1,50 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+// Admin giriş: Render Environment Variables'da ayarla
+// ADMIN_USERNAME=admin
+// ADMIN_PASSWORD_HASH=  (aşağıdaki script ile üret: node -e "require('bcryptjs').hash('sifren', 10).then(h=>console.log(h))")
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '';
+
+// Oturum token'ları (bellek)
+const sessions = new Map();
+const TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 gün
+
+function createToken() {
+  const token = crypto.randomBytes(32).toString('hex');
+  sessions.set(token, { createdAt: Date.now() });
+  return token;
+}
+
+function isValidToken(token) {
+  if (!token) return false;
+  const s = sessions.get(token);
+  if (!s) return false;
+  if (Date.now() - s.createdAt > TOKEN_TTL_MS) {
+    sessions.delete(token);
+    return false;
+  }
+  return true;
+}
+
+function requireAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!isValidToken(token)) {
+    return res.status(401).json({ error: 'Giriş gerekli' });
+  }
+  next();
+}
 
 // Basit dosya tabanlı veritabanı
 const DATA_FILE = path.join(__dirname, 'data.json');
@@ -59,14 +98,57 @@ app.get('/', (req, res) => {
 });
 
 // ================================
-// Blog API
+// Auth API
+// ================================
+app.post('/api/auth/login', async (req, res) => {
+  const { username, password } = req.body || {};
+  if (!ADMIN_PASSWORD_HASH) {
+    return res.status(503).json({ error: 'Sunucuda admin şifresi ayarlanmamış (ADMIN_PASSWORD_HASH)' });
+  }
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Kullanıcı adı ve şifre gerekli' });
+  }
+  if (username !== ADMIN_USERNAME) {
+    return res.status(401).json({ error: 'Kullanıcı adı veya şifre hatalı' });
+  }
+  try {
+    const match = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+    if (!match) {
+      return res.status(401).json({ error: 'Kullanıcı adı veya şifre hatalı' });
+    }
+    const token = createToken();
+    return res.json({ token });
+  } catch (err) {
+    console.error('Login error', err);
+    return res.status(500).json({ error: 'Giriş işlemi başarısız' });
+  }
+});
+
+app.get('/api/auth/me', (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!isValidToken(token)) {
+    return res.status(401).json({ error: 'Oturum geçersiz' });
+  }
+  res.json({ ok: true });
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (token) sessions.delete(token);
+  res.json({ ok: true });
+});
+
+// ================================
+// Blog API (yazma korumalı)
 // ================================
 app.get('/api/blogs', (req, res) => {
   const data = loadData();
   res.json(data.blogs || []);
 });
 
-app.post('/api/blogs', (req, res) => {
+app.post('/api/blogs', requireAuth, (req, res) => {
   const data = loadData();
   const blog = req.body;
 
@@ -102,7 +184,7 @@ app.post('/api/blogs', (req, res) => {
   res.json({ ok: true, blog: data.blogs.find(b => b.id === id) });
 });
 
-app.delete('/api/blogs/:id', (req, res) => {
+app.delete('/api/blogs/:id', requireAuth, (req, res) => {
   const { id } = req.params;
   const data = loadData();
   const before = (data.blogs || []).length;
@@ -130,7 +212,7 @@ app.get('/api/pages/:key', (req, res) => {
   res.json(data[storageKey] || {});
 });
 
-app.put('/api/pages/:key', (req, res) => {
+app.put('/api/pages/:key', requireAuth, (req, res) => {
   const { key } = req.params;
   const storageKey = `page_${key}`;
 
@@ -154,7 +236,7 @@ app.get('/api/media', (req, res) => {
   res.json(data.media_gallery || []);
 });
 
-app.post('/api/media', (req, res) => {
+app.post('/api/media', requireAuth, (req, res) => {
   const data = loadData();
   const item = req.body;
 
@@ -178,7 +260,7 @@ app.post('/api/media', (req, res) => {
   res.json({ ok: true, item: data.media_gallery.find(m => m.id === id) });
 });
 
-app.delete('/api/media/:id', (req, res) => {
+app.delete('/api/media/:id', requireAuth, (req, res) => {
   const { id } = req.params;
   const data = loadData();
   const before = (data.media_gallery || []).length;
