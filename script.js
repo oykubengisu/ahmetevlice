@@ -360,13 +360,21 @@ function showNotification(message, type) {
  * Smooth Scroll
  */
 function initSmoothScroll() {
-    const links = document.querySelectorAll('a[href^="#"]');
+    // Select only internal navigation links, exclude WhatsApp button and external links
+    const links = document.querySelectorAll('a[href^="#"]:not(#whatsapp-btn):not(.whatsapp-btn)');
     
     links.forEach(link => {
         link.addEventListener('click', function(e) {
             const href = this.getAttribute('href');
             
-            if (href === '#') return;
+            // Only handle internal page links
+            if (href === '#' || href.length <= 1) return;
+            
+            // Skip if it's not a valid page anchor (like #home, #about, etc.)
+            const targetId = href.substring(1); // Remove #
+            if (!targetId || targetId.includes('/') || targetId.includes('http')) {
+                return;
+            }
             
             e.preventDefault();
             
@@ -513,13 +521,23 @@ function loadDynamicBlogs() {
     const blogGrid = document.querySelector('.blog-grid');
     if (!blogGrid) return;
     
-    // Get published blogs from localStorage
+    // Eğer "Daha Fazlası" kartı varsa, sonradan tekrar eklemek için sakla
+    const moreCard = blogGrid.querySelector('.blog-more-card');
+    
+    // Get published blogs from localStorage (only first 2 for homepage)
     const blogs = JSON.parse(localStorage.getItem('blog_posts') || '[]')
         .filter(blog => blog.status === 'published')
-        .slice(0, 6);
+        .slice(0, 2);
     
-    // If no blogs in admin, keep the static content
-    if (blogs.length === 0) return;
+    // If no blogs in admin, sadece Daha Fazlası kartı kalsın
+    if (blogs.length === 0) {
+        if (moreCard) {
+            blogGrid.innerHTML = moreCard.outerHTML;
+        } else {
+            blogGrid.innerHTML = '';
+        }
+        return;
+    }
     
     // Category icons mapping
     const categoryIcons = {
@@ -529,6 +547,9 @@ function loadDynamicBlogs() {
         'epilepsi': 'fas fa-bolt',
         'inme': 'fas fa-heartbeat',
         'uyku': 'fas fa-bed',
+        'botoks': 'fas fa-syringe',
+        'agri': 'fas fa-hand-holding-medical',
+        'diger': 'fas fa-stethoscope',
         'genel': 'fas fa-notes-medical'
     };
     
@@ -540,6 +561,9 @@ function loadDynamicBlogs() {
         'epilepsi': 'Epilepsi',
         'inme': 'İnme',
         'uyku': 'Uyku',
+        'botoks': 'Botoks Uygulamaları',
+        'agri': 'Ağrı Blokları',
+        'diger': 'Diğer Nörolojik Hastalıklar',
         'genel': 'Genel'
     };
     
@@ -558,14 +582,33 @@ function loadDynamicBlogs() {
         const icon = categoryIcons[blog.category] || 'fas fa-newspaper';
         const label = categoryLabels[blog.category] || blog.category;
         const delay = ((index % 3) + 1) * 100;
-        
+        const pdfLink = blog.pdfUrl || blog.pdfData;
+        const hasPdf = !!pdfLink;
+        const linkAttrs = hasPdf ? `href="${pdfLink}" target="_blank"` : 'href="#"';
+
+        // Aynı kategori görsellerini blog.html ile eşleştirmek için arka plan renkleri
+        const categoryColors = {
+            'alzheimer': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            'parkinson': 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            'migren': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            'uyku': 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+            'bas-agrisi': 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+            'hareket': 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            'epilepsi': 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+            'inme': 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+            'botoks': 'linear-gradient(135deg, #22c55e 0%, #15803d 100%)',
+            'agri': 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+            'diger': 'linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%)',
+            'genel': 'linear-gradient(135deg, #64748b 0%, #475569 100%)'
+        };
+        const bgColor = categoryColors[blog.category] || 'linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%)';
+
         return `
             <article class="blog-card" data-aos="fade-up" data-aos-delay="${delay}">
                 <div class="blog-image">
-                    ${blog.image ? 
-                        `<img src="${blog.image}" alt="${blog.title}" style="width:100%;height:100%;object-fit:cover;">` :
-                        `<div class="blog-image-placeholder"><i class="${icon}"></i></div>`
-                    }
+                    <div class="blog-image-placeholder" style="background: ${bgColor};">
+                        <i class="${icon}"></i>
+                    </div>
                     <div class="blog-category">${label}</div>
                 </div>
                 <div class="blog-content">
@@ -580,12 +623,12 @@ function loadDynamicBlogs() {
                         </span>
                     </div>
                     <h3 class="blog-title">
-                        <a href="#">${blog.title}</a>
+                        <a ${linkAttrs}>${blog.title}</a>
                     </h3>
                     <p class="blog-excerpt">
                         ${blog.excerpt || blog.title}
                     </p>
-                    <a href="#" class="blog-link">
+                    <a ${linkAttrs} class="blog-link">
                         <span>Devamını Oku</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
@@ -594,7 +637,9 @@ function loadDynamicBlogs() {
         `;
     }).join('');
     
-    blogGrid.innerHTML = blogsHTML;
+    // Dinamik blog kartlarını ve en sonda Daha Fazlası kartını göster
+    const moreCardHtml = moreCard ? moreCard.outerHTML : '';
+    blogGrid.innerHTML = blogsHTML + moreCardHtml;
     
     // Re-initialize AOS for new elements
     initAOSAnimation();
@@ -616,7 +661,54 @@ document.addEventListener('DOMContentLoaded', function() {
     loadAboutContent();
     loadContactContent();
     loadSocialLinks();
+    initWhatsAppButton();
 });
+
+/**
+ * Initialize WhatsApp Button
+ */
+function initWhatsAppButton() {
+    const whatsappBtn = document.getElementById('whatsapp-btn');
+    if (!whatsappBtn) {
+        console.log('WhatsApp button not found');
+        return;
+    }
+    
+    // Get WhatsApp number from localStorage
+    const contactContent = JSON.parse(localStorage.getItem('page_contact') || '{}');
+    
+    if (contactContent.whatsapp && contactContent.whatsapp.trim() !== '') {
+        // Remove any spaces or special characters, keep only numbers
+        const cleanNumber = contactContent.whatsapp.replace(/\D/g, '');
+        
+        if (cleanNumber.length > 0) {
+            // wa.me format automatically opens WhatsApp app on mobile devices
+            // and WhatsApp Web on desktop - this is the most reliable method
+            whatsappBtn.href = `https://wa.me/${cleanNumber}`;
+            whatsappBtn.removeAttribute('onclick');
+            whatsappBtn.style.display = 'flex';
+            whatsappBtn.style.opacity = '1';
+            whatsappBtn.style.cursor = 'pointer';
+            console.log('WhatsApp button configured with number:', cleanNumber);
+        } else {
+            whatsappBtn.href = '#';
+            whatsappBtn.onclick = function(e) {
+                e.preventDefault();
+                alert('Lütfen admin panelinden geçerli bir WhatsApp numarası ekleyin.');
+            };
+        }
+    } else {
+        // No WhatsApp number set
+        whatsappBtn.href = '#';
+        whatsappBtn.onclick = function(e) {
+            e.preventDefault();
+            alert('WhatsApp numarası henüz ayarlanmamış. Lütfen admin panelinden WhatsApp numarasını ekleyin.');
+        };
+        whatsappBtn.style.display = 'flex';
+        whatsappBtn.style.opacity = '0.7';
+        whatsappBtn.style.cursor = 'not-allowed';
+    }
+}
 
 /**
  * Load Hero Section Content
@@ -671,7 +763,16 @@ function loadHeroContent() {
     if (heroContent.image) {
         const heroPlaceholder = document.querySelector('.hero-image .image-placeholder');
         if (heroPlaceholder) {
-            heroPlaceholder.innerHTML = `<img src="${heroContent.image}" alt="Prof. Dr. Ahmet Evlice" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-lg);">`;
+            const img = document.createElement('img');
+            img.src = heroContent.image;
+            img.alt = 'Prof. Dr. Ahmet Evlice';
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:var(--radius-lg);';
+            img.onerror = function() {
+                console.warn('Hero image failed to load:', heroContent.image);
+                this.style.display = 'none';
+            };
+            heroPlaceholder.innerHTML = '';
+            heroPlaceholder.appendChild(img);
         }
     }
 }
@@ -701,7 +802,16 @@ function loadAboutContent() {
     if (aboutContent.image) {
         const aboutPlaceholder = document.querySelector('.about-image .image-placeholder');
         if (aboutPlaceholder) {
-            aboutPlaceholder.innerHTML = `<img src="${aboutContent.image}" alt="Prof. Dr. Ahmet Evlice" style="width:100%;height:100%;object-fit:cover;">`;
+            const img = document.createElement('img');
+            img.src = aboutContent.image;
+            img.alt = 'Prof. Dr. Ahmet Evlice';
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+            img.onerror = function() {
+                console.warn('About image failed to load:', aboutContent.image);
+                this.style.display = 'none';
+            };
+            aboutPlaceholder.innerHTML = '';
+            aboutPlaceholder.appendChild(img);
         }
     }
 }
@@ -724,15 +834,20 @@ function loadContactContent() {
         navPhoneLink.href = `tel:${contactContent.phone1.replace(/\s/g, '')}`;
     }
     
-    // Update contact info cards
-    const phoneCard = document.querySelector('.info-card:nth-child(2) .info-content');
-    if (phoneCard && contactContent.phone1) {
-        let phoneHTML = `<h4>Telefon</h4>`;
-        phoneHTML += `<p><a href="tel:${contactContent.phone1.replace(/\s/g, '')}">${contactContent.phone1}</a></p>`;
-        if (contactContent.phone2) {
-            phoneHTML += `<p><a href="tel:${contactContent.phone2.replace(/\s/g, '')}">${contactContent.phone2}</a></p>`;
+    // Update contact info cards - Phone
+    const phoneCard = document.getElementById('contact-phone-card');
+    const phoneLink = document.getElementById('contact-phone-link');
+    if (phoneCard && phoneLink) {
+        if (contactContent.phone1) {
+            let phoneHTML = `<h4>Telefon</h4>`;
+            phoneHTML += `<p><a href="tel:${contactContent.phone1.replace(/\s/g, '')}">${contactContent.phone1}</a></p>`;
+            if (contactContent.phone2) {
+                phoneHTML += `<p><a href="tel:${contactContent.phone2.replace(/\s/g, '')}">${contactContent.phone2}</a></p>`;
+            }
+            phoneCard.innerHTML = phoneHTML;
+        } else {
+            phoneCard.innerHTML = `<h4>Telefon</h4><p>Telefon numarası eklenmemiş</p>`;
         }
-        phoneCard.innerHTML = phoneHTML;
     }
     
     // Update email
@@ -762,8 +877,29 @@ function loadContactContent() {
     
     // Update WhatsApp button
     const whatsappBtn = document.querySelector('.whatsapp-btn');
-    if (whatsappBtn && contactContent.whatsapp) {
-        whatsappBtn.href = `https://wa.me/${contactContent.whatsapp}`;
+    if (whatsappBtn) {
+        if (contactContent.whatsapp) {
+            // Remove any spaces or special characters, keep only numbers
+            const cleanNumber = contactContent.whatsapp.replace(/\D/g, '');
+            
+            // wa.me format automatically opens WhatsApp app on mobile devices
+            // and WhatsApp Web on desktop - this is the most reliable method
+            whatsappBtn.href = `https://wa.me/${cleanNumber}`;
+            whatsappBtn.style.display = 'flex';
+            whatsappBtn.style.opacity = '1';
+            whatsappBtn.style.cursor = 'pointer';
+            whatsappBtn.onclick = null;
+        } else {
+            // Show button but disable it if no number is set
+            whatsappBtn.style.display = 'flex';
+            whatsappBtn.href = '#';
+            whatsappBtn.style.opacity = '0.5';
+            whatsappBtn.style.cursor = 'not-allowed';
+            whatsappBtn.onclick = function(e) {
+                e.preventDefault();
+                alert('WhatsApp numarası henüz ayarlanmamış. Lütfen admin panelinden WhatsApp numarasını ekleyin.');
+            };
+        }
     }
     
     // Update footer contact

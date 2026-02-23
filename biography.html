@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prof. Dr. Ahmet Evlice - Biyografi | Nöroloji Uzmanı</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <style>
+        .biography-page {
+            padding-top: 100px;
+            background: var(--bg-secondary);
+            min-height: 100vh;
+        }
+        
+        .biography-hero {
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: 40px 0 35px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .biography-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        .biography-hero::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(201, 162, 39, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Yansıma efektleri */
+        .biography-hero {
+            background-image: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                linear-gradient(225deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                var(--gradient-primary);
+        }
+        
+        .reflection-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(135deg, transparent 0%, rgba(201, 162, 39, 0.3) 20%, transparent 40%),
+                linear-gradient(45deg, transparent 0%, rgba(232, 197, 71, 0.25) 30%, transparent 60%),
+                linear-gradient(225deg, transparent 0%, rgba(201, 162, 39, 0.2) 25%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+            animation: shimmer 4s ease-in-out infinite;
+        }
+        
+        .reflection-light {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(201, 162, 39, 0.6) 20%,
+                rgba(232, 197, 71, 0.8) 50%,
+                rgba(201, 162, 39, 0.6) 80%,
+                transparent 100%
+            );
+            box-shadow: 0 0 10px rgba(232, 197, 71, 0.5);
+            pointer-events: none;
+            z-index: 0;
+            animation: moveLine 8s ease-in-out infinite;
+        }
+        
+        .reflection-light:nth-child(3) {
+            top: auto;
+            bottom: 20%;
+            transform: rotate(-15deg);
+            animation: moveLine 10s ease-in-out infinite reverse;
+            animation-delay: -2s;
+        }
+        
+        .reflection-light:nth-child(2) {
+            top: 30%;
+            transform: rotate(25deg);
+            animation-delay: -1s;
+        }
+        
+        .reflection-light:nth-child(4) {
+            top: 60%;
+            transform: rotate(-35deg);
+            animation-delay: -3s;
+        }
+        
+        .reflection-light:nth-child(5) {
+            top: 10%;
+            transform: rotate(45deg);
+            animation-delay: -4s;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+        
+        @keyframes moveLine {
+            0%, 100% {
+                opacity: 0.3;
+                transform: translateX(-100%) rotate(25deg);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateX(100%) rotate(25deg);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            33% {
+                transform: translate(30px, -30px) rotate(120deg);
+            }
+            66% {
+                transform: translate(-20px, 20px) rotate(240deg);
+            }
+        }
+        
+        .biography-hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .biography-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-family: var(--font-heading);
+            color: var(--white);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .biography-subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+            font-weight: 400;
+            color: var(--white);
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.3px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .biography-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .biography-section {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 50px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .section-title-bio {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--accent);
+            font-family: var(--font-heading);
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 40px;
+            padding-left: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 3px solid var(--white);
+            box-shadow: 0 0 0 3px var(--accent);
+        }
+        
+        .timeline-year {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        
+        .timeline-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .timeline-location {
+            font-size: 16px;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+        
+        .timeline-description {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        .education-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .education-card {
+            background: var(--bg-secondary);
+            padding: 30px;
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--accent);
+        }
+        
+        .education-degree {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .education-institution {
+            font-size: 16px;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .education-year {
+            font-size: 14px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .expertise-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .expertise-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            transition: var(--transition-normal);
+        }
+        
+        .expertise-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .expertise-item i {
+            font-size: 24px;
+            color: var(--accent);
+            width: 40px;
+            text-align: center;
+        }
+        
+        .expertise-item span {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .achievement-card {
+            background: linear-gradient(135deg, rgba(201, 162, 39, 0.1) 0%, rgba(232, 197, 71, 0.05) 100%);
+            padding: 30px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            border: 2px solid rgba(201, 162, 39, 0.2);
+        }
+        
+        .achievement-icon {
+            font-size: 40px;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .achievement-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .achievement-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: var(--white);
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 13px;
+            margin-bottom: 20px;
+            transition: var(--transition-normal);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .back-button:hover {
+            transform: translateX(-3px);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .back-button i {
+            font-size: 12px;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .biography-hero {
+                padding: 35px 0 30px;
+            }
+            
+            .biography-title {
+                font-size: 24px;
+            }
+            
+            .biography-subtitle {
+                font-size: 14px;
+            }
+            
+            .back-button {
+                padding: 7px 16px;
+                font-size: 12px;
+                margin-bottom: 20px;
+            }
+            
+            .biography-section {
+                padding: 30px 20px;
+            }
+            
+            .section-title-bio {
+                font-size: 24px;
+            }
+            
+            .timeline {
+                padding-left: 30px;
+            }
+            
+            .education-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .expertise-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .achievements-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="index.html" class="nav-logo">
+                <span class="logo-text">Prof. Dr.</span>
+                <span class="logo-name">AHMET EVLİCE</span>
+                <span class="logo-title">Nöroloji Uzmanı</span>
+            </a>
+
+            <div class="nav-menu" id="nav-menu">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="index.html#home" class="nav-link">Anasayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#about" class="nav-link">Hakkımda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#expertise" class="nav-link">Uzmanlık Alanları</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#media" class="nav-link">Basında Biz</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#contact" class="nav-link">İletişim</a>
+                    </li>
+                </ul>
+                <div class="nav-close" id="nav-close">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+
+            <div class="nav-actions">
+                <div class="nav-social">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                </div>
+                <button class="theme-toggle" id="theme-toggle" title="Tema Değiştir">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+                <div class="nav-toggle" id="nav-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Biography Page -->
+    <div class="biography-page">
+        <!-- Hero Section -->
+        <div class="biography-hero">
+            <div class="reflection-overlay"></div>
+            <div class="reflection-light"></div>
+            <div class="reflection-light"></div>
+            <div class="reflection-light"></div>
+            <div class="reflection-light"></div>
+            <div class="container biography-hero-content">
+                <a href="index.html" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Ana Sayfaya Dön</span>
+                </a>
+                <div style="margin-top: 20px; text-align: center;">
+                    <h1 class="biography-title">Prof. Dr. Ahmet Evlice</h1>
+                    <p class="biography-subtitle">Nöroloji Uzmanı</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container biography-content">
+            <!-- Eğitim -->
+            <div class="biography-section">
+                <h2 class="section-title-bio">
+                    <i class="fas fa-graduation-cap" style="margin-right: 10px; color: var(--accent);"></i>
+                    Eğitim
+                </h2>
+                <div class="education-grid">
+                    <div class="education-card">
+                        <div class="education-degree">Lisans</div>
+                        <div class="education-institution">Tıp Fakültesi</div>
+                        <div class="education-institution">Çukurova Üniversitesi</div>
+                        <div class="education-year">2003</div>
+                    </div>
+                    <div class="education-card">
+                        <div class="education-degree">Tıpta Uzmanlık</div>
+                        <div class="education-institution">Nöroloji</div>
+                        <div class="education-institution">Dokuz Eylül Üniversitesi</div>
+                        <div class="education-year">2009</div>
+                    </div>
+                </div>
+                <div style="margin-top: 30px; padding: 20px; background: var(--bg-secondary); border-radius: var(--radius-md);">
+                    <h3 style="font-size: 18px; font-weight: 600; color: var(--primary); margin-bottom: 10px;">Uzmanlık Tezi</h3>
+                    <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.8;">
+                        <strong>"Obstruktif Uyku Apne Sendromlu Hastalarda Polinöropati ve Disotonomi Varlığının Elektrofizyolojik Yöntemlerle Araştırılması"</strong><br>
+                        Tez Danışmanı: Doç. Dr. İbrahim Öztura - Dokuz Eylül Üniversitesi Tıp Fakültesi Nöroloji Anabilim Dalı
+                    </p>
+                </div>
+            </div>
+
+            <!-- Kariyer Geçmişi -->
+            <div class="biography-section">
+                <h2 class="section-title-bio">
+                    <i class="fas fa-briefcase" style="margin-right: 10px; color: var(--accent);"></i>
+                    Kariyer Geçmişi
+                </h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-year">2004-2009</div>
+                        <div class="timeline-title">Araştırma Görevlisi</div>
+                        <div class="timeline-location">Dokuz Eylül Üniversitesi Tıp Fakültesi Nöroloji Anabilim Dalı</div>
+                        <div class="timeline-description">
+                            Uzmanlık eğitimi süresince uyku hastalıkları ve elektrofizyoloji ile ilgilenmiştir. 
+                            Türk Uyku Tıbbı Derneği Uyku Hekimliği yeterlilik sınavını ve Türk Nöroloji Derneği 
+                            yeterlilik sınavını geçerek sertifika almaya hak kazanmıştır.
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">2010-2011</div>
+                        <div class="timeline-title">Uzman Doktor</div>
+                        <div class="timeline-location">İstanbul Kasımpaşa Askeri Hastanesi</div>
+                        <div class="timeline-description">
+                            Askerlik görevi sırasında İstanbul'da farklı Nöroloji kliniklerinde çalışma fırsatı bulmuş, 
+                            elektrofizyoloji laboratuvarında özellikle travmaya bağlı sinir hasarları ile ilgili çalışma yapmıştır.
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">2011-2012</div>
+                        <div class="timeline-title">Uzman Doktor</div>
+                        <div class="timeline-location">Şanlıurfa Viranşehir Devlet Hastanesi</div>
+                        <div class="timeline-description">
+                            Zorunlu hizmet görevini tamamlamış, bu dönemde özellikle farklı baş ağrısı tipleri ile ilgili deneyim sahibi olmuştur.
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">2012-2015</div>
+                        <div class="timeline-title">Dr. Öğretim Üyesi</div>
+                        <div class="timeline-location">Çukurova Üniversitesi Tıp Fakültesi Nöroloji Anabilim Dalı</div>
+                        <div class="timeline-description">
+                            Öğretim üyesi olarak çalışmaya başlamıştır.
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">2014</div>
+                        <div class="timeline-title">Davranış Nörolojisi Polikliniği Kurucusu</div>
+                        <div class="timeline-location">Çukurova Üniversitesi</div>
+                        <div class="timeline-description">
+                            İstanbul Üniversitesi Tıp Fakültesi'nde "Davranış Nörolojisi ve Hareket Bozuklukları" biriminde çalıştıktan sonra 
+                            Çukurova Üniversitesi Nöroloji anabilim dalı "Davranış Nörolojisi (Alzheimer hastalığı ve diğer demansiyel sendromlar)" 
+                            polikliniğini kurmuştur.
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">2015-2017</div>
+                        <div class="timeline-title">Yardımcı Doçent</div>
+                        <div class="timeline-location">Çukurova Üniversitesi Tıp Fakültesi Nöroloji Anabilim Dalı</div>
+                        <div class="timeline-description">
+                            Stajer Doktor Eğitim Sorumlusu olarak görev yapmıştır.
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">2017</div>
+                        <div class="timeline-title">Doçent</div>
+                        <div class="timeline-location">Çukurova Üniversitesi Tıp Fakültesi Nöroloji Anabilim Dalı</div>
+                        <div class="timeline-description">
+                            Doçent unvanını almıştır. 2018-2021 yılları arasında ÇÜTF Yönetim Kurulu ve Fakülte Kurulu üyeliği yapmıştır.
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">2018 - Halen</div>
+                        <div class="timeline-title">Türkiye Alzheimer Derneği Adana Şube Başkanı</div>
+                        <div class="timeline-location">Adana</div>
+                        <div class="timeline-description">
+                            Derneğin kurucu başkanlığını yapmış ve halen başkan olarak görevini sürdürmektedir.
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">2023</div>
+                        <div class="timeline-title">Profesör</div>
+                        <div class="timeline-location">Çukurova Üniversitesi Tıp Fakültesi Nöroloji Anabilim Dalı</div>
+                        <div class="timeline-description">
+                            Profesör unvanını almıştır. 2024-2026 yılları arasında Araştırma Görevlisi Eğitim Sorumlusu olarak görev yapmıştır.
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">2026 - Halen</div>
+                        <div class="timeline-title">Profesör</div>
+                        <div class="timeline-location">Adana Özel Ortadoğu Hastanesi</div>
+                        <div class="timeline-description">
+                            Çukurova Üniversitesi Tıp Fakültesi Nöroloji Anabilim Dalı'ndan ayrılarak Adana Özel Ortadoğu Hastanesi'nde çalışmaya başlamıştır.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uzmanlık Alanları -->
+            <div class="biography-section">
+                <h2 class="section-title-bio">
+                    <i class="fas fa-stethoscope" style="margin-right: 10px; color: var(--accent);"></i>
+                    Uzmanlık Alanları ve Poliklinikler
+                </h2>
+                <div class="expertise-list">
+                    <div class="expertise-item">
+                        <i class="fas fa-memory"></i>
+                        <span>Demans (Alzheimer Hastalığı ve Diğer Demansiyel Sendromlar)</span>
+                    </div>
+                    <div class="expertise-item">
+                        <i class="fas fa-walking"></i>
+                        <span>Hareket Bozuklukları (Parkinson Hastalığı)</span>
+                    </div>
+                    <div class="expertise-item">
+                        <i class="fas fa-head-side-virus"></i>
+                        <span>Baş Ağrısı</span>
+                    </div>
+                    <div class="expertise-item">
+                        <i class="fas fa-syringe"></i>
+                        <span>Botulinum Toksin Uygulamaları (Botox, Dysport)</span>
+                    </div>
+                    <div class="expertise-item">
+                        <i class="fas fa-bed"></i>
+                        <span>Uyku Bozuklukları</span>
+                    </div>
+                    <div class="expertise-item">
+                        <i class="fas fa-wave-square"></i>
+                        <span>Elektromyografi (EMG) Laboratuvarı</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Başarılar ve Sertifikalar -->
+            <div class="biography-section">
+                <h2 class="section-title-bio">
+                    <i class="fas fa-trophy" style="margin-right: 10px; color: var(--accent);"></i>
+                    Başarılar ve Sertifikalar
+                </h2>
+                <div class="achievements-grid">
+                    <div class="achievement-card">
+                        <div class="achievement-icon">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div class="achievement-title">Türk Nöroloji Derneği Yeterlilik Sertifikası</div>
+                        <div class="achievement-desc">2009 ve 2023 yıllarında sertifika almaya hak kazanmıştır</div>
+                    </div>
+                    <div class="achievement-card">
+                        <div class="achievement-icon">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <div class="achievement-title">Türk Uyku Tıbbı Derneği Uyku Hekimliği Yeterlilik Sertifikası</div>
+                        <div class="achievement-desc">Uzmanlık eğitimi sırasında sertifika almıştır</div>
+                    </div>
+                    <div class="achievement-card">
+                        <div class="achievement-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="achievement-title">200+ Bilimsel Yayın</div>
+                        <div class="achievement-desc">Ulusal ve uluslararası dergilerde yayınlanmış makale, kitap editörlüğü ve kitap bölümü</div>
+                    </div>
+                    <div class="achievement-card">
+                        <div class="achievement-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="achievement-title">Dernek Üyelikleri</div>
+                        <div class="achievement-desc">Türkiye Alzheimer Derneği, Dünya Hareket Bozuklukları Derneği, Dünya Baş Ağrısı Derneği, Küresel Migren Derneği, Türk Nöroloji Derneği, Türk Uyku Tıbbı Derneği, Türk Nöropsikoloji Derneği üyesidir</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yabancı Diller -->
+            <div class="biography-section">
+                <h2 class="section-title-bio">
+                    <i class="fas fa-language" style="margin-right: 10px; color: var(--accent);"></i>
+                    Yabancı Diller
+                </h2>
+                <div class="expertise-list">
+                    <div class="expertise-item">
+                        <i class="fas fa-globe"></i>
+                        <span>İngilizce (YÖK-DİL: 81,25)</span>
+                    </div>
+                    <div class="expertise-item">
+                        <i class="fas fa-globe"></i>
+                        <span>Almanca (Adana Almanca Anadolu Lisesi)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="index.html" class="footer-logo">
+                        <span class="logo-text">Prof. Dr.</span>
+                        <span class="logo-name">AHMET EVLİCE</span>
+                    </a>
+                    <p class="footer-description">
+                        Beyin ve sinir hastalıkları alanında 23 yılı aşkın deneyim ile 
+                        hastalarına en iyi hizmeti sunmaktadır.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Hızlı Linkler</h4>
+                    <ul>
+                        <li><a href="index.html#home">Anasayfa</a></li>
+                        <li><a href="index.html#about">Hakkımda</a></li>
+                        <li><a href="index.html#expertise">Uzmanlık Alanları</a></li>
+                        <li><a href="index.html#media">Basında Biz</a></li>
+                        <li><a href="index.html#contact">İletişim</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h4>İletişim</h4>
+                    <ul>
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span class="footer-address">Ortadoğu Hastanesi, Adana</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Prof. Dr. Ahmet Evlice. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Button -->
+    <a href="#" class="whatsapp-btn" id="whatsapp-btn" target="_blank" rel="noopener noreferrer" onclick="return false;">
+        <i class="fab fa-whatsapp"></i>
+        <span>WhatsApp</span>
+    </a>
+
+    <!-- Back to Top -->
+    <a href="#header" class="back-to-top" id="back-to-top">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+
+    <script src="script.js"></script>
+</body>
+</html>

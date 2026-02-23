@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Prof. Dr. Ahmet Evlice | Nöroloji Uzmanı</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .blog-page {
+            padding-top: 120px;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+        
+        .blog-page-header {
+            background: var(--white);
+            padding: 60px 0;
+            margin-bottom: 60px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .blog-page-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .blog-page-subtitle {
+            font-size: 18px;
+            color: var(--gray);
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .blog-filters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 50px;
+        }
+        
+        .filter-btn {
+            padding: 12px 24px;
+            background: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            transition: var(--transition-normal);
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--accent);
+            color: var(--white);
+            border-color: var(--accent);
+        }
+        
+        .blog-articles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .blog-article-card {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-normal);
+            border: 1px solid var(--light-gray);
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+        
+        .blog-article-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: transparent;
+        }
+        
+        .blog-article-image {
+            position: relative;
+            height: 150px;
+            overflow: hidden;
+        }
+        
+        .blog-article-content {
+            padding: 25px 20px;
+        }
+        
+        .blog-article-category {
+            display: inline-block;
+            padding: 6px 12px;
+            background: var(--accent);
+            color: var(--white);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-radius: var(--radius-xl);
+            margin-bottom: 12px;
+        }
+        
+        .blog-article-title {
+            font-family: var(--font-body);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .blog-article-excerpt {
+            font-size: 13px;
+            color: var(--gray);
+            line-height: 1.7;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .blog-article-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+        
+        .blog-article-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        .blog-article-link i {
+            transition: var(--transition-normal);
+        }
+        
+        .blog-article-card:hover .blog-article-link i {
+            transform: translateX(5px);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+        
+        .no-results i {
+            font-size: 64px;
+            color: var(--light-gray);
+            margin-bottom: 20px;
+        }
+        
+        @media screen and (max-width: 992px) {
+            .blog-articles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media screen and (max-width: 768px) {
+            .blog-page-title {
+                font-size: 36px;
+            }
+            
+            .blog-articles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .blog-filters {
+                gap: 10px;
+            }
+            
+            .filter-btn {
+                padding: 10px 20px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-icon"></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="index.html" class="nav-logo">
+                <span class="logo-text">Prof. Dr.</span>
+                <span class="logo-name">AHMET EVLİCE</span>
+                <span class="logo-title">Nöroloji Uzmanı</span>
+            </a>
+
+            <div class="nav-menu" id="nav-menu">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">Anasayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#about" class="nav-link">Hakkımda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#expertise" class="nav-link">Uzmanlık Alanları</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="blog.html" class="nav-link active">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#media" class="nav-link">Basında Biz</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="index.html#contact" class="nav-link">İletişim</a>
+                    </li>
+                </ul>
+                <div class="nav-close" id="nav-close">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+
+            <div class="nav-actions">
+                <div class="nav-social">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                </div>
+                <button class="theme-toggle" id="theme-toggle" title="Tema Değiştir">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+                <div class="nav-toggle" id="nav-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Blog Page -->
+    <div class="blog-page">
+        <div class="blog-page-header">
+            <div class="container">
+                <h1 class="blog-page-title">Sağlık Yazıları</h1>
+                <p class="blog-page-subtitle">
+                    Nöroloji alanındaki güncel gelişmeler, sağlıklı yaşam önerileri ve uzman görüşleri
+                </p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Category Filters -->
+            <div class="blog-filters">
+                <button class="filter-btn active" data-category="all">Tümü</button>
+                <button class="filter-btn" data-category="alzheimer">Alzheimer</button>
+                <button class="filter-btn" data-category="parkinson">Parkinson</button>
+                <button class="filter-btn" data-category="migren">Migren</button>
+                <button class="filter-btn" data-category="uyku">Uyku Bozuklukları</button>
+                <button class="filter-btn" data-category="bas-agrisi">Baş Ağrısı</button>
+                <button class="filter-btn" data-category="hareket">Hareket Bozuklukları</button>
+                <button class="filter-btn" data-category="inme">İnme</button>
+                <button class="filter-btn" data-category="botoks">Botoks Uygulamaları</button>
+                <button class="filter-btn" data-category="agri">Ağrı Blokları</button>
+                <button class="filter-btn" data-category="diger">Diğer Nörolojik Hastalıklar</button>
+            </div>
+
+            <!-- Blog Articles Grid -->
+            <div class="blog-articles-grid" id="blog-articles-grid">
+                <!-- Articles will be dynamically loaded here -->
+            </div>
+
+            <!-- No Results Message -->
+            <div class="no-results" id="no-results" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>Bu kategoride makale bulunamadı</h3>
+                <p>Farklı bir kategori seçmeyi deneyin.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="index.html" class="footer-logo">
+                        <span class="logo-text">Prof. Dr.</span>
+                        <span class="logo-name">AHMET EVLİCE</span>
+                    </a>
+                    <p class="footer-description">
+                        Beyin ve sinir hastalıkları alanında 30 yılı aşkın deneyim ile 
+                        hastalarına en iyi hizmeti sunmaktadır.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Hızlı Linkler</h4>
+                    <ul>
+                        <li><a href="index.html">Anasayfa</a></li>
+                        <li><a href="index.html#about">Hakkımda</a></li>
+                        <li><a href="index.html#expertise">Uzmanlık Alanları</a></li>
+                        <li><a href="index.html#media">Basında Biz</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="index.html#contact">İletişim</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Uzmanlık Alanları</h4>
+                    <ul>
+                        <li><a href="index.html#expertise">Baş Ağrısı & Migren</a></li>
+                        <li><a href="index.html#expertise">Hareket Bozuklukları</a></li>
+                        <li><a href="index.html#expertise">Alzheimer & Demans</a></li>
+                        <li><a href="index.html#expertise">Elektrofizyoloji</a></li>
+                        <li><a href="index.html#expertise">Botoks Uygulamaları</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h4>İletişim</h4>
+                    <ul>
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span class="footer-address">Ortadoğu Hastanesi, Adana</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Prof. Dr. Ahmet Evlice. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Button -->
+    <a href="#" class="whatsapp-btn" id="whatsapp-btn" target="_blank" rel="noopener noreferrer" onclick="return false;">
+        <i class="fab fa-whatsapp"></i>
+        <span>WhatsApp</span>
+    </a>
+
+    <!-- Back to Top -->
+    <a href="#header" class="back-to-top" id="back-to-top">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+
+    <script src="script.js"></script>
+    <script>
+        // Kategori isimleri
+        const categoryNames = {
+            'alzheimer': 'Alzheimer',
+            'parkinson': 'Parkinson',
+            'migren': 'Migren',
+            'uyku': 'Uyku Bozuklukları',
+            'bas-agrisi': 'Baş Ağrısı',
+            'hareket': 'Hareket Bozuklukları',
+            'epilepsi': 'Epilepsi',
+            'inme': 'İnme',
+            'botoks': 'Botoks Uygulamaları',
+            'agri': 'Ağrı Blokları',
+            'diger': 'Diğer Nörolojik Hastalıklar',
+            'genel': 'Genel'
+        };
+
+        // Kategori ikon ve renkleri
+        const categoryConfig = {
+            'alzheimer': { icon: 'fa-brain', color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+            'parkinson': { icon: 'fa-user-injured', color: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+            'migren': { icon: 'fa-head-side-virus', color: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+            'uyku': { icon: 'fa-bed', color: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
+            'bas-agrisi': { icon: 'fa-head-side-virus', color: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)' },
+            'hareket': { icon: 'fa-walking', color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
+            'epilepsi': { icon: 'fa-bolt', color: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' },
+            'inme': { icon: 'fa-heartbeat', color: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)' },
+            'botoks': { icon: 'fa-syringe', color: 'linear-gradient(135deg, #22c55e 0%, #15803d 100%)' },
+            'agri': { icon: 'fa-hand-holding-medical', color: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' },
+            'diger': { icon: 'fa-stethoscope', color: 'linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%)' },
+            'genel': { icon: 'fa-notes-medical', color: 'linear-gradient(135deg, #64748b 0%, #475569 100%)' }
+        };
+
+        function formatBlogDate(dateStr) {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return '';
+            return date.toLocaleDateString('tr-TR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function getBlogArticlesFromStorage() {
+            const raw = localStorage.getItem('blog_posts');
+            if (!raw) return [];
+            try {
+                const blogs = JSON.parse(raw).filter(b => b.status === 'published');
+                return blogs.map((b, idx) => {
+                    const cfg = categoryConfig[b.category] || categoryConfig['genel'];
+                    return {
+                        id: b.id || idx,
+                        category: b.category || 'genel',
+                        title: b.title,
+                        excerpt: b.excerpt || b.title,
+                        date: formatBlogDate(b.date || b.createdAt),
+                        imageColor: cfg.color,
+                        icon: cfg.icon,
+                        pdfUrl: b.pdfUrl || '',
+                        pdfData: b.pdfData || null
+                    };
+                });
+            } catch (e) {
+                console.warn('Blog verileri okunamadı:', e);
+                return [];
+            }
+        }
+
+        // Render articles
+        function renderArticles(category = 'all') {
+            const grid = document.getElementById('blog-articles-grid');
+            const noResults = document.getElementById('no-results');
+            const allArticles = getBlogArticlesFromStorage();
+            
+            const filteredArticles = category === 'all' 
+                ? allArticles 
+                : allArticles.filter(article => article.category === category);
+            
+            if (filteredArticles.length === 0) {
+                grid.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            grid.style.display = 'grid';
+            noResults.style.display = 'none';
+            
+            grid.innerHTML = filteredArticles.map(article => {
+                const pdfLink = article.pdfUrl || article.pdfData;
+                const linkAttrs = pdfLink 
+                    ? `href="${pdfLink}" target="_blank"` 
+                    : 'href="#"';
+
+                return `
+                <a ${linkAttrs} class="blog-article-card" data-article-id="${article.id}">
+                    <div class="blog-article-image">
+                        <div class="blog-image-placeholder" style="background: ${article.imageColor};">
+                            <i class="fas ${article.icon}"></i>
+                        </div>
+                        <div class="blog-category">${categoryNames[article.category]}</div>
+                    </div>
+                    <div class="blog-article-content">
+                        <h3 class="blog-article-title">${article.title}</h3>
+                        <p class="blog-article-excerpt">${article.excerpt}</p>
+                        <div class="blog-article-meta">
+                            <span><i class="fas fa-calendar-alt"></i> ${article.date}</span>
+                        </div>
+                        <span class="blog-article-link">
+                            <span>Devamını Oku</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </div>
+                </a>
+            `;
+            }).join('');
+        }
+
+        // Filter buttons event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Get category
+                    const category = this.getAttribute('data-category');
+                    
+                    // Render filtered articles
+                    renderArticles(category);
+                });
+            });
+            
+            // Initial render
+            renderArticles('all');
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Back to top button
+        const backToTop = document.getElementById('back-to-top');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+    </script>
+</body>
+</html>

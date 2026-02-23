@@ -229,9 +229,13 @@
                             <option value="migren">Migren</option>
                             <option value="alzheimer">Alzheimer</option>
                             <option value="parkinson">Parkinson</option>
+                            <option value="bas-agrisi">Baş Ağrısı</option>
                             <option value="epilepsi">Epilepsi</option>
                             <option value="inme">İnme</option>
+                            <option value="botoks">Botoks Uygulamaları</option>
+                            <option value="agri">Ağrı Blokları</option>
                             <option value="uyku">Uyku</option>
+                            <option value="diger">Diğer Nörolojik Hastalıklar</option>
                             <option value="genel">Genel</option>
                         </select>
                         <select id="filter-status">
@@ -316,6 +320,43 @@
                                 </div>
                                 <div class="editor-content" id="blog-content" contenteditable="true" placeholder="Yazı içeriğini buraya yazın..."></div>
                             </div>
+
+                            <!-- PDF İçeriği -->
+                            <div class="form-group">
+                                <label>PDF İçeriği</label>
+                                <div class="pdf-upload" id="pdf-upload">
+                                    <div class="pdf-upload-placeholder" id="pdf-upload-placeholder">
+                                        <i class="fas fa-file-pdf"></i>
+                                        <span>PDF dosyası yüklemek için tıklayın</span>
+                                        <small>Yalnızca PDF dosyaları desteklenir</small>
+                                    </div>
+                                    <div class="pdf-file-info" id="pdf-file-info" style="display: none;">
+                                        <div class="pdf-file-main">
+                                            <i class="fas fa-file-pdf"></i>
+                                            <div class="pdf-file-text">
+                                                <span id="pdf-file-name"></span>
+                                                <small id="pdf-file-size"></small>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="remove-pdf-btn" id="remove-pdf" title="PDF'i Kaldır">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <input type="file" id="pdf-file-input" accept="application/pdf" hidden>
+                                </div>
+                                <small class="help-text">
+                                    Blog içeriğini PDF olarak yükleyebilirsiniz. Ana sitede ziyaretçiler başlığa tıkladığında PDF yeni sekmede açılır.
+                                </small>
+                                
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <label for="blog-pdf-url">PDF URL (Tercih Edilen Yöntem)</label>
+                                    <input type="text" id="blog-pdf-url" placeholder="Ör: /pdfs/dosya.pdf veya https://...">
+                                    <small class="help-text">
+                                        PDF dosyanız sunucuda veya internette bir adreste kayıtlıysa buraya linkini girin. 
+                                        <strong>Devamını Oku</strong> bağlantısı doğrudan bu adrese yönlendirilir ve tarayıcı limiti sorunları yaşanmaz.
+                                    </small>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="form-sidebar">
@@ -329,9 +370,13 @@
                                         <option value="migren">Migren</option>
                                         <option value="alzheimer">Alzheimer</option>
                                         <option value="parkinson">Parkinson</option>
+                                        <option value="bas-agrisi">Baş Ağrısı</option>
                                         <option value="epilepsi">Epilepsi</option>
                                         <option value="inme">İnme</option>
+                                        <option value="botoks">Botoks Uygulamaları</option>
+                                        <option value="agri">Ağrı Blokları</option>
                                         <option value="uyku">Uyku</option>
+                                        <option value="diger">Diğer Nörolojik Hastalıklar</option>
                                         <option value="genel">Genel</option>
                                     </select>
                                 </div>
@@ -523,8 +568,14 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>WhatsApp Numarası</label>
+                            <label>
+                                <i class="fab fa-whatsapp" style="color: #25d366; margin-right: 8px;"></i>
+                                WhatsApp Numarası
+                            </label>
                             <input type="tel" id="contact-whatsapp" placeholder="905001234567">
+                            <small style="display: block; margin-top: 5px; color: var(--text-secondary); font-size: 12px;">
+                                Ülke kodu ile birlikte girin (örn: 905001234567). Bu numara ana sayfadaki WhatsApp butonunda kullanılacaktır.
+                            </small>
                         </div>
                         <div class="form-group">
                             <label>Google Maps Embed URL</label>

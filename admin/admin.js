@@ -37,6 +37,11 @@ function formatDateInput(date) {
     return d.toISOString().split('T')[0];
 }
 
+// Global state for PDF content
+let currentPdfData = null;
+let currentPdfName = '';
+let currentPdfSize = '';
+
 function showToast(message, type = 'success') {
     const toast = document.getElementById('toast');
     if (!toast) return;
@@ -54,9 +59,13 @@ function getCategoryLabel(category) {
         'migren': 'Migren',
         'alzheimer': 'Alzheimer',
         'parkinson': 'Parkinson',
+        'bas-agrisi': 'Baş Ağrısı',
         'epilepsi': 'Epilepsi',
         'inme': 'İnme',
+        'botoks': 'Botoks Uygulamaları',
+        'agri': 'Ağrı Blokları',
         'uyku': 'Uyku',
+        'diger': 'Diğer Nörolojik Hastalıklar',
         'genel': 'Genel'
     };
     return labels[category] || category;
@@ -71,7 +80,32 @@ function getBlogs() {
 }
 
 function saveBlogs(blogs) {
-    localStorage.setItem(CONFIG.storageKeys.blogs, JSON.stringify(blogs));
+    try {
+        localStorage.setItem(CONFIG.storageKeys.blogs, JSON.stringify(blogs));
+    } catch (e) {
+        // Storage quota dolduysa PDF verilerini temizleyip tekrar dene
+        if (e.name === 'QuotaExceededError' || e.code === 22) {
+            console.warn('Storage quota exceeded. Trying without PDF data...');
+            const slimBlogs = blogs.map(b => ({
+                ...b,
+                pdfData: null,
+                pdfName: '',
+                pdfSize: ''
+            }));
+            try {
+                localStorage.setItem(CONFIG.storageKeys.blogs, JSON.stringify(slimBlogs));
+                showToast('Depolama sınırı aşıldı. PDF içerikleri kaldırılarak kaydedildi.', 'error');
+            } catch (err) {
+                console.error('Could not save blogs even after removing PDFs', err);
+                showToast('Depolama sınırı aşıldı. Bazı eski yazıları silmeniz gerekiyor.', 'error');
+                return;
+            }
+        } else {
+            console.error('Error saving blogs', e);
+            showToast('Blog verileri kaydedilemedi.', 'error');
+            return;
+        }
+    }
     // Ana sayfadaki blog bölümünü de güncelle
     if (window.updateMainPageBlogs) {
         window.updateMainPageBlogs();
@@ -473,6 +507,14 @@ function initBlogForm() {
     const imagePreview = document.getElementById('featured-image-preview');
     const uploadPlaceholder = document.getElementById('upload-placeholder');
     const removeImageBtn = document.getElementById('remove-image');
+    // PDF upload elements
+    const pdfUpload = document.getElementById('pdf-upload');
+    const pdfInput = document.getElementById('pdf-file-input');
+    const pdfPlaceholder = document.getElementById('pdf-upload-placeholder');
+    const pdfInfo = document.getElementById('pdf-file-info');
+    const pdfFileName = document.getElementById('pdf-file-name');
+    const pdfFileSize = document.getElementById('pdf-file-size');
+    const pdfUrlInput = document.getElementById('blog-pdf-url');
     
     // Editor toolbar
     initEditor();
@@ -516,6 +558,54 @@ function initBlogForm() {
             imageInput.value = '';
         });
     }
+
+    // PDF upload handlers
+    if (pdfUpload && pdfInput) {
+        pdfUpload.addEventListener('click', () => pdfInput.click());
+        if (pdfPlaceholder) {
+            pdfPlaceholder.addEventListener('click', (e) => {
+                e.stopPropagation();
+                pdfInput.click();
+            });
+        }
+        pdfInput.addEventListener('change', function() {
+            const file = this.files && this.files[0];
+            if (!file) return;
+            
+            if (file.type !== 'application/pdf') {
+                showToast('Lütfen PDF formatında bir dosya seçin.', 'error');
+                this.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentPdfData = e.target.result;
+                currentPdfName = file.name;
+                currentPdfSize = formatFileSize(file.size);
+                
+                if (pdfFileName) pdfFileName.textContent = currentPdfName;
+                if (pdfFileSize) pdfFileSize.textContent = currentPdfSize;
+                
+                if (pdfPlaceholder) pdfPlaceholder.style.display = 'none';
+                if (pdfInfo) pdfInfo.style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    const removePdfBtn = document.getElementById('remove-pdf');
+    if (removePdfBtn) {
+        removePdfBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentPdfData = null;
+            currentPdfName = '';
+            currentPdfSize = '';
+            if (pdfInfo) pdfInfo.style.display = 'none';
+            if (pdfPlaceholder) pdfPlaceholder.style.display = 'block';
+            if (pdfInput) pdfInput.value = '';
+        });
+    }
 }
 
 function initEditor() {
@@ -556,6 +646,7 @@ function saveBlogPost(status) {
     const date = document.getElementById('blog-date').value;
     const readTime = document.getElementById('blog-read-time').value;
     const image = document.getElementById('featured-image-preview').src;
+    const pdfUrl = document.getElementById('blog-pdf-url')?.value.trim() || '';
     
     if (!title || !category) {
         showToast('Başlık ve kategori zorunludur!', 'error');
@@ -571,6 +662,11 @@ function saveBlogPost(status) {
         date: date || new Date().toISOString(),
         readTime: parseInt(readTime) || 5,
         image: image || '',
+        // Eğer PDF URL girildiyse onu kullan, aksi halde (varsa) base64 PDF'i sakla
+        pdfUrl: pdfUrl || '',
+        pdfData: pdfUrl ? null : (currentPdfData || null),
+        pdfName: pdfUrl ? '' : (currentPdfName || ''),
+        pdfSize: pdfUrl ? '' : (currentPdfSize || ''),
         status
     };
     
@@ -599,6 +695,7 @@ function resetBlogForm() {
     document.getElementById('blog-read-time').value = '5';
     document.getElementById('blog-meta-title').value = '';
     document.getElementById('blog-meta-desc').value = '';
+    const pdfUrlInput = document.getElementById('blog-pdf-url');
     
     const imagePreview = document.getElementById('featured-image-preview');
     const uploadPlaceholder = document.getElementById('upload-placeholder');
@@ -610,6 +707,18 @@ function resetBlogForm() {
     removeImageBtn.style.display = 'none';
     
     document.getElementById('blog-form-title').textContent = 'Yeni Blog Yazısı';
+    
+    // Reset PDF state
+    currentPdfData = null;
+    currentPdfName = '';
+    currentPdfSize = '';
+    const pdfPlaceholder = document.getElementById('pdf-upload-placeholder');
+    const pdfInfo = document.getElementById('pdf-file-info');
+    const pdfInput = document.getElementById('pdf-file-input');
+    if (pdfPlaceholder) pdfPlaceholder.style.display = 'block';
+    if (pdfInfo) pdfInfo.style.display = 'none';
+    if (pdfInput) pdfInput.value = '';
+    if (pdfUrlInput) pdfUrlInput.value = '';
 }
 
 window.editBlog = function(id) {
@@ -636,6 +745,30 @@ window.editBlog = function(id) {
     }
     
     document.getElementById('blog-form-title').textContent = 'Yazıyı Düzenle';
+    
+    // Load PDF URL / data if exists
+    const pdfUrlInput = document.getElementById('blog-pdf-url');
+    if (pdfUrlInput) {
+        pdfUrlInput.value = blog.pdfUrl || '';
+    }
+    
+    currentPdfData = blog.pdfData || null;
+    currentPdfName = blog.pdfName || '';
+    currentPdfSize = blog.pdfSize || '';
+    const pdfPlaceholder = document.getElementById('pdf-upload-placeholder');
+    const pdfInfo = document.getElementById('pdf-file-info');
+    const pdfFileName = document.getElementById('pdf-file-name');
+    const pdfFileSize = document.getElementById('pdf-file-size');
+    
+    if (currentPdfData && currentPdfName && pdfInfo && pdfPlaceholder && !blog.pdfUrl) {
+        if (pdfFileName) pdfFileName.textContent = currentPdfName;
+        if (pdfFileSize) pdfFileSize.textContent = currentPdfSize;
+        pdfPlaceholder.style.display = 'none';
+        pdfInfo.style.display = 'flex';
+    } else {
+        if (pdfPlaceholder) pdfPlaceholder.style.display = 'block';
+        if (pdfInfo) pdfInfo.style.display = 'none';
+    }
     window.location.hash = 'new-blog';
 };
 
