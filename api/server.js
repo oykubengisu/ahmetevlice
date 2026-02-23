@@ -1,0 +1,195 @@
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const fs = require('fs');
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+
+// Basit dosya tabanlı veritabanı
+const DATA_FILE = path.join(__dirname, 'data.json');
+
+function loadData() {
+  try {
+    if (!fs.existsSync(DATA_FILE)) {
+      const initial = {
+        blogs: [],
+        page_hero: {},
+        page_about: {},
+        page_contact: {},
+        page_social: {},
+        media_gallery: []
+      };
+      fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), 'utf8');
+      return initial;
+    }
+
+    const raw = fs.readFileSync(DATA_FILE, 'utf8');
+    return JSON.parse(raw || '{}');
+  } catch (err) {
+    console.error('Veri dosyası okunamadı:', err);
+    return {
+      blogs: [],
+      page_hero: {},
+      page_about: {},
+      page_contact: {},
+      page_social: {},
+      media_gallery: []
+    };
+  }
+}
+
+function saveData(data) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+}
+
+// Orta katmanlar
+app.use(helmet());
+app.use(
+  cors({
+    origin: '*'
+  })
+);
+app.use(express.json({ limit: '10mb' })); // Base64 görseller/PDF'ler için limit
+
+// Sağlık kontrolü
+app.get('/', (req, res) => {
+  res.json({ ok: true, message: 'Content API is running' });
+});
+
+// ================================
+// Blog API
+// ================================
+app.get('/api/blogs', (req, res) => {
+  const data = loadData();
+  res.json(data.blogs || []);
+});
+
+app.post('/api/blogs', (req, res) => {
+  const data = loadData();
+  const blog = req.body;
+
+  if (!blog || !blog.title || !blog.category) {
+    return res.status(400).json({ error: 'title ve category zorunludur' });
+  }
+
+  const id = blog.id || Date.now().toString(36) + Math.random().toString(36).slice(2);
+  const now = new Date().toISOString();
+
+  const existingIndex = (data.blogs || []).findIndex(b => b.id === id);
+  if (existingIndex >= 0) {
+    data.blogs[existingIndex] = {
+      ...data.blogs[existingIndex],
+      ...blog,
+      id,
+      updatedAt: now
+    };
+  } else {
+    data.blogs = [
+      {
+        ...blog,
+        id,
+        createdAt: now,
+        updatedAt: now,
+        views: blog.views || 0
+      },
+      ...(data.blogs || [])
+    ];
+  }
+
+  saveData(data);
+  res.json({ ok: true, blog: data.blogs.find(b => b.id === id) });
+});
+
+app.delete('/api/blogs/:id', (req, res) => {
+  const { id } = req.params;
+  const data = loadData();
+  const before = (data.blogs || []).length;
+  data.blogs = (data.blogs || []).filter(b => b.id !== id);
+  const after = data.blogs.length;
+
+  saveData(data);
+  res.json({ ok: true, deleted: before - after });
+});
+
+// ================================
+// Sayfa içerikleri (hero/about/contact/social)
+// ================================
+const PAGE_KEYS = ['page_hero', 'page_about', 'page_contact', 'page_social'];
+
+app.get('/api/pages/:key', (req, res) => {
+  const { key } = req.params;
+  const storageKey = `page_${key}`;
+
+  if (!PAGE_KEYS.includes(storageKey)) {
+    return res.status(400).json({ error: 'Geçersiz sayfa anahtarı' });
+  }
+
+  const data = loadData();
+  res.json(data[storageKey] || {});
+});
+
+app.put('/api/pages/:key', (req, res) => {
+  const { key } = req.params;
+  const storageKey = `page_${key}`;
+
+  if (!PAGE_KEYS.includes(storageKey)) {
+    return res.status(400).json({ error: 'Geçersiz sayfa anahtarı' });
+  }
+
+  const payload = req.body || {};
+  const data = loadData();
+  data[storageKey] = payload;
+
+  saveData(data);
+  res.json({ ok: true, data: payload });
+});
+
+// ================================
+// Medya galerisi
+// ================================
+app.get('/api/media', (req, res) => {
+  const data = loadData();
+  res.json(data.media_gallery || []);
+});
+
+app.post('/api/media', (req, res) => {
+  const data = loadData();
+  const item = req.body;
+
+  if (!item || !item.data || !item.name) {
+    return res.status(400).json({ error: 'name ve data zorunludur' });
+  }
+
+  const id = item.id || Date.now().toString(36) + Math.random().toString(36).slice(2);
+  const now = new Date().toISOString();
+
+  data.media_gallery = [
+    {
+      ...item,
+      id,
+      uploadedAt: now
+    },
+    ...(data.media_gallery || [])
+  ];
+
+  saveData(data);
+  res.json({ ok: true, item: data.media_gallery.find(m => m.id === id) });
+});
+
+app.delete('/api/media/:id', (req, res) => {
+  const { id } = req.params;
+  const data = loadData();
+  const before = (data.media_gallery || []).length;
+  data.media_gallery = (data.media_gallery || []).filter(m => m.id !== id);
+  const after = data.media_gallery.length;
+
+  saveData(data);
+  res.json({ ok: true, deleted: before - after });
+});
+
+app.listen(PORT, () => {
+  console.log(`Content API listening on port ${PORT}`);
+});
+

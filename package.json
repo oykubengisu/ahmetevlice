@@ -1,0 +1,23 @@
+{
+  "name": "ahmet-evlice-site",
+  "version": "1.0.0",
+  "description": "Prof. Dr. Ahmet Evlice web sitesi için içerik yönetimi API'si",
+  "main": "api/server.js",
+  "scripts": {
+    "start": "node api/server.js",
+    "dev": "nodemon api/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "helmet": "^7.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
+
