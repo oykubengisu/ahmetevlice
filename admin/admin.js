@@ -165,17 +165,22 @@ function isLoggedIn() {
 }
 
 async function login(username, password) {
-    const res = await fetchWithRetry(API_BASE + '/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-    });
-    const data = await res.json().catch(() => ({}));
-    if (res.ok && data.token) {
-        sessionStorage.setItem(CONFIG.storageKeys.token, data.token);
-        return true;
+    try {
+        const res = await fetchWithRetry(API_BASE + '/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.token) {
+            sessionStorage.setItem(CONFIG.storageKeys.token, data.token);
+            return { ok: true };
+        }
+        const msg = data.error || (res.status === 503 ? 'Sunucu yapılandırması eksik.' : res.status === 401 ? 'Kullanıcı adı veya şifre hatalı.' : 'Giriş başarısız.');
+        return { ok: false, message: msg };
+    } catch (e) {
+        return { ok: false, message: 'API\'ye bağlanılamadı. Bağlantıyı kontrol edin.' };
     }
-    return false;
 }
 
 function logout() {
@@ -201,6 +206,14 @@ function initLoginPage() {
     
     if (!loginForm) return;
     
+    // URL'de kullanıcı adı/şifre varsa kaldır (güvenlik)
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('username') || url.searchParams.has('password')) {
+        url.searchParams.delete('username');
+        url.searchParams.delete('password');
+        window.history.replaceState({}, '', url.pathname);
+    }
+    
     // Check if already logged in
     if (isLoggedIn()) {
         window.location.href = 'dashboard.html';
@@ -222,16 +235,18 @@ function initLoginPage() {
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
         if (!username || !password) {
+            loginError.querySelector('span').textContent = 'Kullanıcı adı ve şifre girin.';
             loginError.classList.add('show');
-            setTimeout(() => loginError.classList.remove('show'), 3000);
+            setTimeout(() => loginError.classList.remove('show'), 4000);
             return;
         }
-        const ok = await login(username, password);
-        if (ok) {
+        const result = await login(username, password);
+        if (result.ok) {
             window.location.href = 'dashboard.html';
         } else {
+            loginError.querySelector('span').textContent = result.message || 'Kullanıcı adı veya şifre hatalı!';
             loginError.classList.add('show');
-            setTimeout(() => loginError.classList.remove('show'), 3000);
+            setTimeout(() => loginError.classList.remove('show'), 5000);
         }
     });
 }

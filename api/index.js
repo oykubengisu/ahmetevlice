@@ -80,7 +80,7 @@ app.post('/api/auth/login', async (req, res) => {
     return res.json({ token });
   } catch (err) {
     console.error('Login error', err);
-    return res.status(500).json({ error: 'Giriş işlemi başarısız' });
+    return res.status(500).json({ error: err.message || 'Giriş işlemi başarısız' });
   }
 });
 
