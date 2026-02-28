@@ -6,7 +6,7 @@
 // ========================================
 // Configuration
 // ========================================
-const API_BASE = 'https://ahmetevlice.onrender.com';
+const API_BASE = ''; // Aynı domain (Vercel)
 
 const CONFIG = {
     storageKeys: {
@@ -1205,7 +1205,7 @@ function initSettings() {
     
     // Giriş bilgileri Render ortam değişkenlerinde yönetiliyor
     if (credentialsForm) {
-        credentialsForm.innerHTML = '<p class="text-muted" style="margin-bottom:12px;">Giriş, Render üzerindeki API ile doğrulanıyor. Kullanıcı adı ve şifreyi değiştirmek için Render Dashboard → Servisiniz → Environment bölümünde <strong>ADMIN_USERNAME</strong> ve <strong>ADMIN_PASSWORD_HASH</strong> ekleyin veya güncelleyin. Şifre hash\'i için proje klasöründe terminalde: <code>node -e "require(\'bcryptjs\').hash(\'YeniSifren\', 10).then(h=>console.log(h))"</code> çalıştırıp çıkan değeri ADMIN_PASSWORD_HASH olarak yapıştırın.</p>';
+        credentialsForm.innerHTML = '<p class="text-muted" style="margin-bottom:12px;">Giriş, Vercel ortam değişkenlerinde yönetiliyor. Kullanıcı adı ve şifreyi değiştirmek için Vercel Dashboard → Projeniz → Settings → Environment Variables bölümünde <strong>ADMIN_USERNAME</strong> ve <strong>ADMIN_PASSWORD_HASH</strong> ekleyin. Şifre hash\'i için: <code>node -e "require(\'bcryptjs\').hash(\'YeniSifren\', 10).then(h=>console.log(h))"</code></p>';
     }
     
     // Export data

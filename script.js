@@ -515,7 +515,7 @@ if (yearElement) {
 console.log('Prof. Dr. Ahmet Evlice Website - Loaded Successfully');
 
 // API adresi (Render)
-const API_BASE = 'https://ahmetevlice.onrender.com';
+const API_BASE = ''; // Aynı domain (Vercel)
 
 // ========================================
 // Dynamic Blog Section
