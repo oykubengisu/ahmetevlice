@@ -495,6 +495,14 @@
 
         // Filter buttons event listeners
         document.addEventListener('DOMContentLoaded', async function() {
+            const params = new URLSearchParams(window.location.search);
+            let initialCategory = params.get('category') || 'all';
+            
+            // Geçerli olmayan kategori gelirse 'all' kullan
+            if (initialCategory !== 'all' && !categoryNames[initialCategory]) {
+                initialCategory = 'all';
+            }
+
             const filterButtons = document.querySelectorAll('.filter-btn');
             filterButtons.forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -503,7 +511,18 @@
                     renderArticles(this.getAttribute('data-category'));
                 });
             });
-            await renderArticles('all');
+
+            // Sayfa URL'sindeki kategoriye göre aktif butonu ayarla
+            filterButtons.forEach(btn => {
+                const cat = btn.getAttribute('data-category');
+                if (cat === initialCategory) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            await renderArticles(initialCategory);
         });
 
         // Header scroll effect

@@ -73,9 +73,25 @@ function getCategoryLabel(category) {
 // ========================================
 // Storage / API Functions
 // ========================================
+// Render cold start için tekrar deneme (free tier 15 dk sonra uyur)
+async function fetchWithRetry(url, options = {}, retries = 2) {
+    for (let i = 0; i <= retries; i++) {
+        try {
+            const r = await fetch(url, options);
+            return r;
+        } catch (e) {
+            if (i < retries) {
+                await new Promise(r => setTimeout(r, 3000));
+            } else {
+                throw e;
+            }
+        }
+    }
+}
+
 async function getBlogs() {
     try {
-        const r = await fetch(API_BASE + '/api/blogs');
+        const r = await fetchWithRetry(API_BASE + '/api/blogs');
         if (!r.ok) throw new Error();
         return await r.json();
     } catch (e) {
@@ -109,7 +125,7 @@ async function getBlog(id) {
 
 async function saveBlog(blog) {
     try {
-        const res = await fetch(API_BASE + '/api/blogs', {
+        const res = await fetchWithRetry(API_BASE + '/api/blogs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
             body: JSON.stringify(blog)
@@ -119,35 +135,22 @@ async function saveBlog(blog) {
         if (window.updateMainPageBlogs) window.updateMainPageBlogs();
         return blog;
     } catch (e) {
-        const blogs = await getBlogs();
-        const existingIndex = blogs.findIndex(b => b.id === blog.id);
-        if (existingIndex > -1) {
-            blogs[existingIndex] = { ...blogs[existingIndex], ...blog, updatedAt: new Date().toISOString() };
-        } else {
-            blog.id = blog.id || generateId();
-            blog.createdAt = blog.createdAt || new Date().toISOString();
-            blog.updatedAt = new Date().toISOString();
-            blog.views = blog.views || 0;
-            blogs.unshift(blog);
-        }
-        saveBlogsToLocal(blogs);
-        if (window.updateMainPageBlogs) window.updateMainPageBlogs();
-        return blog;
+        showToast('Sunucuya bağlanılamadı. Değişiklikler kaydedilmedi. Lütfen tekrar deneyin.', 'error');
+        throw e;
     }
 }
 
 async function deleteBlog(id) {
     try {
-        const res = await fetch(API_BASE + '/api/blogs/' + encodeURIComponent(id), {
+        const res = await fetchWithRetry(API_BASE + '/api/blogs/' + encodeURIComponent(id), {
             method: 'DELETE',
             headers: getAuthHeader()
         });
         if (res.status === 401) { logout(); return; }
         if (!res.ok) throw new Error();
     } catch (e) {
-        const blogs = await getBlogs();
-        const filtered = blogs.filter(blog => blog.id !== id);
-        saveBlogsToLocal(filtered);
+        showToast('Sunucuya bağlanılamadı. Silme işlemi yapılamadı. Lütfen tekrar deneyin.', 'error');
+        throw e;
     }
 }
 
@@ -162,7 +165,7 @@ function isLoggedIn() {
 }
 
 async function login(username, password) {
-    const res = await fetch(API_BASE + '/api/auth/login', {
+    const res = await fetchWithRetry(API_BASE + '/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -243,7 +246,7 @@ async function initDashboardPage() {
     }
     // Token geçerli mi kontrol et
     try {
-        const r = await fetch(API_BASE + '/api/auth/me', { headers: getAuthHeader() });
+        const r = await fetchWithRetry(API_BASE + '/api/auth/me', { headers: getAuthHeader() });
         if (r.status === 401) {
             sessionStorage.removeItem(CONFIG.storageKeys.token);
             window.location.href = 'index.html';
@@ -675,15 +678,19 @@ async function saveBlogPost(status) {
         status
     };
     
-    await saveBlog(blog);
-    showToast(status === 'published' ? 'Yazı yayınlandı!' : 'Taslak kaydedildi!', 'success');
-    initDashboardStats();
-    initRecentPosts();
-    renderBlogsTable();
-    setTimeout(() => {
-        window.location.hash = 'blogs';
-        resetBlogForm();
-    }, 1000);
+    try {
+        await saveBlog(blog);
+        showToast(status === 'published' ? 'Yazı yayınlandı!' : 'Taslak kaydedildi!', 'success');
+        initDashboardStats();
+        initRecentPosts();
+        renderBlogsTable();
+        setTimeout(() => {
+            window.location.hash = 'blogs';
+            resetBlogForm();
+        }, 1000);
+    } catch (e) {
+        // Hata saveBlog içinde gösterildi
+    }
 }
 
 function resetBlogForm() {
@@ -795,14 +802,20 @@ function initDeleteModal() {
     if (confirmBtn) {
         confirmBtn.addEventListener('click', async () => {
             if (blogToDelete) {
-                await deleteBlog(blogToDelete);
-                showToast('Yazı silindi!', 'success');
-                initDashboardStats();
-                initRecentPosts();
-                renderBlogsTable();
-                blogToDelete = null;
+                try {
+                    await deleteBlog(blogToDelete);
+                    showToast('Yazı silindi!', 'success');
+                    initDashboardStats();
+                    initRecentPosts();
+                    renderBlogsTable();
+                    blogToDelete = null;
+                    modal.classList.remove('show');
+                } catch (e) {
+                    // Hata zaten deleteBlog içinde gösterildi
+                }
+            } else {
+                modal.classList.remove('show');
             }
-            modal.classList.remove('show');
         });
     }
     
@@ -902,7 +915,7 @@ async function loadPageContent() {
 function initPageForms() {
     async function savePage(key, payload) {
         try {
-            const r = await fetch(API_BASE + '/api/pages/' + key, {
+            const r = await fetchWithRetry(API_BASE + '/api/pages/' + key, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
                 body: JSON.stringify(payload)
@@ -911,6 +924,7 @@ function initPageForms() {
             if (!r.ok) throw new Error();
             return true;
         } catch (e) {
+            showToast('Sunucuya bağlanılamadı. Değişiklikler kaydedilmedi. Lütfen tekrar deneyin.', 'error');
             return false;
         }
     }
@@ -931,7 +945,6 @@ function initPageForms() {
                 image: document.querySelector('#hero-image-preview img')?.src || ''
             };
             if (await savePage('hero', heroContent)) showToast('Hero bölümü kaydedildi!', 'success');
-            else { localStorage.setItem('page_hero', JSON.stringify(heroContent)); showToast('Kaydedildi (çevrimdışı).', 'success'); }
         });
     }
     const aboutForm = document.getElementById('about-form');
@@ -945,7 +958,6 @@ function initPageForms() {
                 image: document.querySelector('#about-image-preview img')?.src || ''
             };
             if (await savePage('about', aboutContent)) showToast('Hakkımda bölümü kaydedildi!', 'success');
-            else { localStorage.setItem('page_about', JSON.stringify(aboutContent)); showToast('Kaydedildi (çevrimdışı).', 'success'); }
         });
     }
     const contactForm = document.getElementById('contact-form');
@@ -963,7 +975,6 @@ function initPageForms() {
                 map: document.getElementById('contact-map').value
             };
             if (await savePage('contact', contactContent)) showToast('İletişim bilgileri kaydedildi!', 'success');
-            else { localStorage.setItem('page_contact', JSON.stringify(contactContent)); showToast('Kaydedildi (çevrimdışı).', 'success'); }
         });
     }
     const socialForm = document.getElementById('social-form');
@@ -978,7 +989,6 @@ function initPageForms() {
                 twitter: document.getElementById('social-twitter').value
             };
             if (await savePage('social', socialContent)) showToast('Sosyal medya linkleri kaydedildi!', 'success');
-            else { localStorage.setItem('page_social', JSON.stringify(socialContent)); showToast('Kaydedildi (çevrimdışı).', 'success'); }
         });
     }
 }
@@ -1099,7 +1109,7 @@ function handleMediaUpload(files) {
                 data: e.target.result
             };
             try {
-                const res = await fetch(API_BASE + '/api/media', {
+                const res = await fetchWithRetry(API_BASE + '/api/media', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
                     body: JSON.stringify(mediaItem)
@@ -1108,9 +1118,7 @@ function handleMediaUpload(files) {
                 if (!res.ok) throw new Error();
                 showToast('Fotoğraf yüklendi!', 'success');
             } catch (err) {
-                mediaItemsCache.unshift({ ...mediaItem, id: generateId(), uploadedAt: new Date().toISOString() });
-                localStorage.setItem('media_gallery', JSON.stringify(mediaItemsCache));
-                showToast('Yüklendi (çevrimdışı).', 'success');
+                showToast('Sunucuya bağlanılamadı. Fotoğraf yüklenemedi. Lütfen tekrar deneyin.', 'error');
             }
             renderMediaGallery();
         };
@@ -1172,7 +1180,7 @@ window.copyMediaUrl = function(id) {
 window.deleteMedia = async function(id) {
     if (!confirm('Bu fotoğrafı silmek istediğinizden emin misiniz?')) return;
     try {
-        const r = await fetch(API_BASE + '/api/media/' + encodeURIComponent(id), {
+        const r = await fetchWithRetry(API_BASE + '/api/media/' + encodeURIComponent(id), {
             method: 'DELETE',
             headers: getAuthHeader()
         });
@@ -1180,9 +1188,7 @@ window.deleteMedia = async function(id) {
         if (!r.ok) throw new Error();
         showToast('Fotoğraf silindi!', 'success');
     } catch (e) {
-        mediaItemsCache = mediaItemsCache.filter(m => m.id !== id);
-        localStorage.setItem('media_gallery', JSON.stringify(mediaItemsCache));
-        showToast('Silindi (çevrimdışı).', 'success');
+        showToast('Sunucuya bağlanılamadı. Silme işlemi yapılamadı. Lütfen tekrar deneyin.', 'error');
     }
     renderMediaGallery();
 };
