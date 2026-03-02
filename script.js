@@ -667,6 +667,17 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadContactContent();
     await loadSocialLinks();
     initWhatsAppButton();
+    
+    // Hakkımda: Davetli konuşmalar & bildiriler "Daha fazlası"
+    document.querySelectorAll('.about-more-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-target');
+            const list = document.getElementById(targetId);
+            if (!list) return;
+            const expanded = list.classList.toggle('about-list-expanded');
+            btn.textContent = expanded ? 'Daha az göster' : 'Daha fazlası';
+        });
+    });
 });
 
 /**
