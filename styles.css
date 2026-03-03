@@ -3128,3 +3128,18 @@ ul {
     }
 }
 
+/* ========================================
+   Biyografi ve Uzmanlık Detay Sayfaları
+   ======================================== */
+.biography-page {
+    padding-top: 110px;
+    background: var(--bg-secondary);
+    min-height: 100vh;
+}
+
+@media screen and (max-width: 768px) {
+    .biography-page {
+        padding-top: 90px;
+    }
+}
+
