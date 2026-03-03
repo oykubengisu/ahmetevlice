@@ -1298,6 +1298,19 @@ ul {
     color: var(--accent);
 }
 
+.about-list .about-list-heading {
+    padding-left: 0;
+    margin-top: 14px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.about-list .about-list-heading::before {
+    content: '';
+}
+
 .about-list-item-more {
     display: none;
 }
