@@ -1,6 +1,17 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api?path=$1" }
+    { "source": "/api/(.*)", "destination": "/api?path=$1" },
+    { "source": "/hakkimda", "destination": "/biography.html" },
+    { "source": "/blog", "destination": "/blog.html" },
+    { "source": "/demans-alzheimer-parkinson", "destination": "/demans-alzheimer-parkinson.html" },
+    { "source": "/noropsikoloji", "destination": "/noropsikoloji.html" },
+    { "source": "/bas-agrisi-bas-donmesi-agri-blokajlari", "destination": "/bas-agrisi-bas-donmesi-agri-blokajlari.html" },
+    { "source": "/botoks-uygulamalari", "destination": "/botoks-uygulamalari.html" },
+    { "source": "/serebrovaskuler-hastaliklar", "destination": "/serebrovaskuler-hastaliklar.html" },
+    { "source": "/emg", "destination": "/emg.html" },
+    { "source": "/uyku-bozukluklari", "destination": "/uyku-bozukluklari.html" },
+    { "source": "/epilepsi-eeg", "destination": "/epilepsi-eeg.html" },
+    { "source": "/diger-norolojik-hastaliklar", "destination": "/diger-norolojik-hastaliklar.html" }
   ],
   "functions": {
     "api/index.js": {
