@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://ahmetevlice.com/sitemap.xml
+Disallow: /admin/
