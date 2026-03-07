@@ -2044,6 +2044,7 @@ ul {
     transition: var(--transition-normal);
     text-decoration: none;
     font-weight: 600;
+    animation: whatsapp-pulse 3s ease-in-out infinite;
 }
 
 .whatsapp-btn i {
@@ -2058,6 +2059,15 @@ ul {
 .whatsapp-btn:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 30px rgba(37, 211, 102, 0.5);
+}
+
+@keyframes whatsapp-pulse {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-5px) scale(1.05);
+    }
 }
 
 /* ========================================

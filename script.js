@@ -65,9 +65,10 @@ function initPreloader() {
     const preloader = document.querySelector('.preloader');
     
     window.addEventListener('load', function() {
+        // İçerik yüklenir yüklenmez preloader'ı hızlıca gizle
         setTimeout(function() {
             preloader.classList.add('hidden');
-        }, 500);
+        }, 50);
     });
 }
 
@@ -394,16 +395,29 @@ function initSmoothScroll() {
 }
 
 /**
- * Parallax Effect for Hero Background
+ * Parallax Effect for Hero Background (only on larger screens)
  */
-window.addEventListener('scroll', function() {
-    const scrolled = window.scrollY;
-    const heroPattern = document.querySelector('.hero-pattern');
+(function() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     
-    if (heroPattern && scrolled < window.innerHeight) {
-        heroPattern.style.transform = `translateY(${scrolled * 0.3}px)`;
+    function onScroll() {
+        const scrolled = window.scrollY;
+        const heroPattern = document.querySelector('.hero-pattern');
+        
+        if (heroPattern && scrolled < window.innerHeight) {
+            heroPattern.style.transform = `translateY(${scrolled * 0.3}px)`;
+        }
     }
-});
+    
+    function initParallax() {
+        if (window.innerWidth > 768 && !prefersReducedMotion.matches) {
+            window.addEventListener('scroll', onScroll);
+        }
+    }
+    
+    initParallax();
+    window.addEventListener('resize', initParallax);
+})();
 
 /**
  * Image Placeholder Hover Effect
@@ -489,19 +503,6 @@ document.querySelectorAll('.expertise-card').forEach(card => {
 document.querySelectorAll('.card-icon').forEach(icon => {
     icon.style.transition = 'transform 0.5s ease, background 0.3s ease';
 });
-
-/**
- * WhatsApp Button Pulse Animation
- */
-const whatsappBtn = document.querySelector('.whatsapp-btn');
-if (whatsappBtn) {
-    setInterval(() => {
-        whatsappBtn.style.transform = 'translateY(-5px) scale(1.05)';
-        setTimeout(() => {
-            whatsappBtn.style.transform = 'translateY(0) scale(1)';
-        }, 200);
-    }, 3000);
-}
 
 /**
  * Dynamic Year in Footer
