@@ -453,11 +453,13 @@ function initQuickActions() {
 // ========================================
 // Blogs Page
 // ========================================
+let currentBlogScope = 'makale'; // 'makale' veya 'blog'
 function initBlogsPage() {
     const addBlogBtn = document.getElementById('add-blog-btn');
     const searchInput = document.getElementById('blog-search');
     const categoryFilter = document.getElementById('filter-category');
     const statusFilter = document.getElementById('filter-status');
+    const scopeTabs = document.querySelectorAll('.blogs-tabs .tab-btn');
     
     if (addBlogBtn) {
         addBlogBtn.addEventListener('click', () => {
@@ -477,6 +479,17 @@ function initBlogsPage() {
         statusFilter.addEventListener('change', renderBlogsTable);
     }
     
+    // Makale / Blog sekmeleri
+    scopeTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const scope = tab.getAttribute('data-blog-scope') || 'makale';
+            currentBlogScope = scope;
+            scopeTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            renderBlogsTable();
+        });
+    });
+    
     renderBlogsTable();
 }
 
@@ -492,6 +505,14 @@ async function renderBlogsTable() {
     if (searchTerm) blogs = blogs.filter(b => b.title.toLowerCase().includes(searchTerm));
     if (categoryFilter) blogs = blogs.filter(b => b.category === categoryFilter);
     if (statusFilter) blogs = blogs.filter(b => b.status === statusFilter);
+    
+    // Tür filtresi (Makaleler / Blog Yazıları)
+    blogs = blogs.filter(b => {
+        const kind = b.kind || 'makale';
+        if (currentBlogScope === 'blog') return kind === 'blog';
+        // Varsayılan: makaleler görünür, blog yazıları hariç
+        return kind !== 'blog';
+    });
     if (blogs.length === 0) {
         tableWrapper.style.display = 'none';
         emptyState.style.display = 'block';
@@ -666,6 +687,8 @@ async function saveBlogPost(status) {
     const excerpt = document.getElementById('blog-excerpt').value;
     const content = document.getElementById('blog-content').innerHTML;
     const category = document.getElementById('blog-category').value;
+    const kindSelect = document.getElementById('blog-kind');
+    const kind = kindSelect ? (kindSelect.value || 'makale') : 'makale';
     const date = document.getElementById('blog-date').value;
     const readTime = document.getElementById('blog-read-time').value;
     const image = document.getElementById('featured-image-preview').src;
@@ -682,6 +705,7 @@ async function saveBlogPost(status) {
         excerpt,
         content,
         category,
+        kind,
         date: date || new Date().toISOString(),
         readTime: parseInt(readTime) || 5,
         image: image || '',
@@ -714,6 +738,10 @@ function resetBlogForm() {
     document.getElementById('blog-excerpt').value = '';
     document.getElementById('blog-content').innerHTML = '';
     document.getElementById('blog-category').value = '';
+    const kindSelect = document.getElementById('blog-kind');
+    if (kindSelect) {
+        kindSelect.value = 'makale';
+    }
     document.getElementById('blog-date').value = formatDateInput(new Date());
     document.getElementById('blog-read-time').value = '5';
     document.getElementById('blog-meta-title').value = '';
@@ -765,6 +793,11 @@ window.editBlog = async function(id) {
         imagePreview.style.display = 'block';
         uploadPlaceholder.style.display = 'none';
         removeImageBtn.style.display = 'flex';
+    }
+    
+    const kindSelect = document.getElementById('blog-kind');
+    if (kindSelect) {
+        kindSelect.value = blog.kind || 'makale';
     }
     
     document.getElementById('blog-form-title').textContent = 'Yazıyı Düzenle';

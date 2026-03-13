@@ -533,7 +533,11 @@ async function loadDynamicBlogs() {
     } catch (e) {
         blogs = JSON.parse(localStorage.getItem('blog_posts') || '[]');
     }
-    blogs = blogs.filter(blog => blog.status === 'published').slice(0, 2);
+    blogs = blogs
+        .filter(blog => blog.status === 'published')
+        // Türü 'blog' olan yazılar ana sayfa blog bölümünde gösterilsin
+        .filter(blog => (blog.kind || 'makale') === 'blog')
+        .slice(0, 2);
     
     // If no blogs in admin, sadece Daha Fazlası kartı kalsın
     if (blogs.length === 0) {
