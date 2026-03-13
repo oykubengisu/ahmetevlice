@@ -425,6 +425,191 @@
             'genel': { icon: 'fa-notes-medical', color: 'linear-gradient(135deg, #64748b 0%, #475569 100%)' }
         };
 
+        // API'de henüz blog verisi yoksa kullanılacak statik PDF makaleler
+        const staticArticles = [
+            // Alzheimer / Demans / Nöropsikoloji
+            {
+                id: 'pdf-alzheimer-evreleri',
+                category: 'alzheimer',
+                title: 'Alzheimer Hastalığının Evreleri Nelerdir? Tedavisi Var mı?',
+                excerpt: 'Alzheimer hastalığının klinik evreleri, erken belirtiler ve tedavi seçeneklerinin özet anlatımı.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Alzheimer hastalığının Evreleri Nelerdir_ Tedavisi var mı_ (2).pdf')
+            },
+            {
+                id: 'pdf-demans-nedir',
+                category: 'alzheimer',
+                title: 'Demans Nedir?',
+                excerpt: 'Demansın tanımı, en sık nedenleri ve günlük yaşam üzerindeki etkileri.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Demans nedir_.pdf')
+            },
+            {
+                id: 'pdf-noropsikolojik-degerlendirme',
+                category: 'alzheimer',
+                title: 'Nöropsikolojik Değerlendirme Nedir?',
+                excerpt: 'Bellek, dikkat ve diğer bilişsel işlevlerin nöropsikolojik testlerle değerlendirilmesi.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Nöropsikolojik Değerlendirme .pdf')
+            },
+
+            // Parkinson ve hareket bozuklukları
+            {
+                id: 'pdf-parkinson',
+                category: 'parkinson',
+                title: 'Parkinson Hastalığı',
+                excerpt: 'Parkinson hastalığının belirtileri, seyri ve tedavi yaklaşımları.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Parkinson.pdf')
+            },
+            {
+                id: 'pdf-multipl-skleroz',
+                category: 'diger',
+                title: 'Multipl Skleroz (MS)',
+                excerpt: 'MS hastalığının temel özellikleri, belirtileri ve tanı süreci.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Multipl Skleroz.pdf')
+            },
+
+            // Baş ağrısı ve ağrı
+            {
+                id: 'pdf-bas-agrisi',
+                category: 'bas-agrisi',
+                title: 'Baş Ağrısı',
+                excerpt: 'Baş ağrısının sık görülen tipleri ve ne zaman nöroloğa başvurulması gerektiği.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Baş ağrısı.pdf')
+            },
+            {
+                id: 'pdf-agri-blokaji',
+                category: 'agri',
+                title: 'Ağrı Blokajı Nedir?',
+                excerpt: 'Sinir blokajı ve ağrı blokajı yöntemleri hakkında genel bilgiler.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Ağrı Blokajı.pdf')
+            },
+
+            // Uyku bozuklukları
+            {
+                id: 'pdf-uyku-apnesi',
+                category: 'uyku',
+                title: 'Uyku Apnesi',
+                excerpt: 'Obstruktif uyku apne sendromunun belirtileri, tanısı ve tedavi seçenekleri.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Uyku Apnesi.pdf')
+            },
+            {
+                id: 'pdf-insomnia',
+                category: 'uyku',
+                title: 'İnsomnia (Uykusuzluk)',
+                excerpt: 'Uykusuzluk yakınmasının nedenleri ve tedavi yaklaşımlarının özeti.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /İnsomnia.pdf')
+            },
+            {
+                id: 'pdf-narkolepsi',
+                category: 'uyku',
+                title: 'Narkolepsi',
+                excerpt: 'Gündüz aşırı uyuklama ve ani uyku atakları ile seyreden narkolepsi hakkında bilgilendirme.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Narkolepsi.pdf')
+            },
+
+            // Vertigo / baş dönmesi
+            {
+                id: 'pdf-vertigo',
+                category: 'bas-agrisi',
+                title: 'Vertigo (Baş Dönmesi)',
+                excerpt: 'Baş dönmesinin nörolojik ve iç kulak kaynaklı nedenleri ve değerlendirme süreci.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Vertigo.pdf')
+            },
+
+            // Epilepsi
+            {
+                id: 'pdf-epilepsi',
+                category: 'diger',
+                title: 'Epilepsi (Sara Hastalığı)',
+                excerpt: 'Epilepsi nöbetleri, tanı yöntemleri ve tedavi seçeneklerinin özeti.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Epilepsi.pdf')
+            },
+
+            // Botoks
+            {
+                id: 'pdf-botox',
+                category: 'botoks',
+                title: 'Nörolojide Botoks (Botulinum Toksin) Uygulamaları',
+                excerpt: 'Hemifasial spazm, distoni, migren ve diğer nörolojik durumlarda botoks tedavisinin kullanımı.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Botox.pdf')
+            },
+
+            // EMG / EEG
+            {
+                id: 'pdf-emg',
+                category: 'diger',
+                title: 'EMG (Elektromiyografi) Nedir?',
+                excerpt: 'Periferik sinir ve kas hastalıklarının değerlendirilmesinde kullanılan EMG testi hakkında bilgi.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /EMG.pdf')
+            },
+            {
+                id: 'pdf-eeg',
+                category: 'diger',
+                title: 'EEG (Elektroensefalografi) Nedir?',
+                excerpt: 'Beyin elektriksel aktivitesinin incelendiği EEG tetkiki hakkında temel bilgiler.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /EEG.pdf')
+            },
+
+            // Kas hastalıkları
+            {
+                id: 'pdf-kas-hastaliklari',
+                category: 'diger',
+                title: 'Kas Hastalıkları',
+                excerpt: 'Kas hastalıklarının temel belirtileri ve tanı süreçleri.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Kas Hastalıkları.pdf')
+            },
+            {
+                id: 'pdf-miyopati',
+                category: 'diger',
+                title: 'Miyopatiler',
+                excerpt: 'Miyopati grubundaki kas hastalıklarının genel özellikleri.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Miyopati .pdf')
+            },
+
+            // Diğer nörolojik hastalıklar (ALS, Myasthenia Gravis, vb.)
+            {
+                id: 'pdf-als',
+                category: 'diger',
+                title: 'ALS (Amyotrofik Lateral Skleroz)',
+                excerpt: 'ALS hastalığının klinik özellikleri ve tedavi yaklaşımlarının özeti.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /ALS.pdf')
+            },
+            {
+                id: 'pdf-myasthenia-gravis',
+                category: 'diger',
+                title: 'Myasthenia Gravis',
+                excerpt: 'Myasthenia Gravis hastalığında kas güçsüzlüğü, tanı ve tedavi yaklaşımları.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /Myasthenia Gravis.pdf')
+            },
+
+            // İnme
+            {
+                id: 'pdf-inme',
+                category: 'inme',
+                title: 'İnme (Felç) Nedir?',
+                excerpt: 'İnme tipleri, risk faktörleri ve erken müdahalenin önemi.',
+                date: '2024',
+                pdfUrl: encodeURI('/Blog Yazıları Ahmet Evlice /İnme.pdf')
+            }
+        ];
+
         function formatBlogDate(dateStr) {
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return '';
@@ -445,18 +630,39 @@
                 const raw = localStorage.getItem('blog_posts');
                 if (raw) try { blogs = JSON.parse(raw); } catch (err) {}
             }
-            return blogs.filter(b => b.status === 'published').map((b, idx) => {
-                const cfg = categoryConfig[b.category] || categoryConfig['genel'];
+
+            const mapped = blogs
+                .filter(b => b.status === 'published')
+                .map((b, idx) => {
+                    const cfg = categoryConfig[b.category] || categoryConfig['genel'];
+                    return {
+                        id: b.id || idx,
+                        category: b.category || 'genel',
+                        title: b.title,
+                        excerpt: b.excerpt || b.title,
+                        date: formatBlogDate(b.date || b.createdAt),
+                        imageColor: cfg.color,
+                        icon: cfg.icon,
+                        pdfUrl: b.pdfUrl || '',
+                        pdfData: b.pdfData || null
+                    };
+                });
+
+            if (mapped.length > 0) return mapped;
+
+            // API'den veri yoksa statik PDF makaleleri kullan
+            return staticArticles.map((a, idx) => {
+                const cfg = categoryConfig[a.category] || categoryConfig['genel'];
                 return {
-                    id: b.id || idx,
-                    category: b.category || 'genel',
-                    title: b.title,
-                    excerpt: b.excerpt || b.title,
-                    date: formatBlogDate(b.date || b.createdAt),
+                    id: a.id || idx,
+                    category: a.category,
+                    title: a.title,
+                    excerpt: a.excerpt,
+                    date: a.date || '',
                     imageColor: cfg.color,
                     icon: cfg.icon,
-                    pdfUrl: b.pdfUrl || '',
-                    pdfData: b.pdfData || null
+                    pdfUrl: a.pdfUrl,
+                    pdfData: null
                 };
             });
         }
