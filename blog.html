@@ -648,10 +648,8 @@
                     };
                 });
 
-            if (mapped.length > 0) return mapped;
-
-            // API'den veri yoksa statik PDF makaleleri kullan
-            return staticArticles.map((a, idx) => {
+            // Her durumda: API'den gelen bloglara ek olarak statik PDF makaleleri de göster
+            const staticMapped = staticArticles.map((a, idx) => {
                 const cfg = categoryConfig[a.category] || categoryConfig['genel'];
                 return {
                     id: a.id || idx,
@@ -665,6 +663,8 @@
                     pdfData: null
                 };
             });
+
+            return [...mapped, ...staticMapped];
         }
 
         // Render articles
