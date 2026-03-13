@@ -276,22 +276,43 @@
         </nav>
     </header>
 
-    <!-- Blog Page (Boş Şablon) -->
+    <!-- Blog Page -->
     <div class="blog-page">
         <div class="blog-page-header">
             <div class="container">
                 <h1 class="blog-page-title">Blog</h1>
                 <p class="blog-page-subtitle">
-                    Blog yazıları yakında eklenecektir.
+                    Nöroloji alanındaki güncel blog yazıları, hasta bilgilendirmeleri ve makaleler.
                 </p>
             </div>
         </div>
 
         <div class="container">
-            <div class="no-results" style="text-align: center; padding: 80px 20px;">
-                <i class="fas fa-file-alt" style="font-size: 64px; color: var(--light-gray); margin-bottom: 20px;"></i>
-                <h3>Henüz blog yazısı eklenmedi</h3>
-                <p>Yeni içerikler admin panelinden eklendikçe burada görüntülenecektir.</p>
+            <!-- Category Filters -->
+            <div class="blog-filters">
+                <button class="filter-btn active" data-category="all">Tümü</button>
+                <button class="filter-btn" data-category="alzheimer">Alzheimer</button>
+                <button class="filter-btn" data-category="parkinson">Parkinson</button>
+                <button class="filter-btn" data-category="migren">Migren</button>
+                <button class="filter-btn" data-category="uyku">Uyku Bozuklukları</button>
+                <button class="filter-btn" data-category="bas-agrisi">Baş Ağrısı</button>
+                <button class="filter-btn" data-category="hareket">Hareket Bozuklukları</button>
+                <button class="filter-btn" data-category="inme">İnme</button>
+                <button class="filter-btn" data-category="botoks">Botoks Uygulamaları</button>
+                <button class="filter-btn" data-category="agri">Ağrı Blokları</button>
+                <button class="filter-btn" data-category="diger">Diğer Nörolojik Hastalıklar</button>
+            </div>
+
+            <!-- Blog Articles Grid -->
+            <div class="blog-articles-grid" id="blog-articles-grid">
+                <!-- Yazılar dinamik olarak yüklenecek -->
+            </div>
+
+            <!-- No Results Message -->
+            <div class="no-results" id="no-results" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>Bu kategoride blog yazısı bulunamadı</h3>
+                <p>Farklı bir kategori seçmeyi veya daha sonra tekrar kontrol etmeyi deneyin.</p>
             </div>
         </div>
     </div>
@@ -373,5 +394,164 @@
     </a>
 
     <script src="script.js"></script>
+    <script>
+        const API_BASE_BLOG = ''; // Aynı domain (Vercel)
+
+        // Kategori isimleri
+        const categoryNames = {
+            'alzheimer': 'Alzheimer',
+            'parkinson': 'Parkinson',
+            'migren': 'Migren',
+            'uyku': 'Uyku Bozuklukları',
+            'bas-agrisi': 'Baş Ağrısı',
+            'hareket': 'Hareket Bozuklukları',
+            'epilepsi': 'Epilepsi',
+            'inme': 'İnme',
+            'botoks': 'Botoks Uygulamaları',
+            'agri': 'Ağrı Blokları',
+            'diger': 'Diğer Nörolojik Hastalıklar',
+            'genel': 'Genel'
+        };
+
+        // Kategori ikon ve renkleri (ana sayfadaki ile uyumlu)
+        const categoryConfig = {
+            'alzheimer': { icon: 'fa-brain', color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+            'parkinson': { icon: 'fa-user-injured', color: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+            'migren': { icon: 'fa-head-side-virus', color: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+            'uyku': { icon: 'fa-bed', color: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
+            'bas-agrisi': { icon: 'fa-head-side-virus', color: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)' },
+            'hareket': { icon: 'fa-walking', color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
+            'epilepsi': { icon: 'fa-bolt', color: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' },
+            'inme': { icon: 'fa-heartbeat', color: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)' },
+            'botoks': { icon: 'fa-syringe', color: 'linear-gradient(135deg, #22c55e 0%, #15803d 100%)' },
+            'agri': { icon: 'fa-hand-holding-medical', color: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' },
+            'diger': { icon: 'fa-stethoscope', color: 'linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%)' },
+            'genel': { icon: 'fa-notes-medical', color: 'linear-gradient(135deg, #64748b 0%, #475569 100%)' }
+        };
+
+        function formatBlogDate(dateStr) {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return '';
+            return date.toLocaleDateString('tr-TR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        async function getBlogArticles() {
+            let blogs = [];
+            try {
+                const r = await fetch(API_BASE_BLOG + '/api/blogs');
+                if (r.ok) blogs = await r.json();
+                else throw new Error();
+            } catch (e) {
+                const raw = localStorage.getItem('blog_posts');
+                if (raw) try { blogs = JSON.parse(raw); } catch (err) {}
+            }
+
+            // Sadece admin panelinde Tür = 'Blog Yazıları' olan ve yayınlanmış yazıları getir
+            const mapped = blogs
+                .filter(b => b.status === 'published')
+                .filter(b => (b.kind || 'makale') === 'blog')
+                .map((b, idx) => {
+                    const cfg = categoryConfig[b.category] || categoryConfig['genel'];
+                    return {
+                        id: b.id || idx,
+                        category: b.category || 'genel',
+                        title: b.title,
+                        excerpt: b.excerpt || b.title,
+                        date: formatBlogDate(b.date || b.createdAt),
+                        imageColor: cfg.color,
+                        icon: cfg.icon,
+                        pdfUrl: b.pdfUrl || '',
+                        pdfData: b.pdfData || null
+                    };
+                });
+
+            return mapped;
+        }
+
+        // Yazıları render et
+        async function renderArticles(category = 'all') {
+            const grid = document.getElementById('blog-articles-grid');
+            const noResults = document.getElementById('no-results');
+            const allArticles = await getBlogArticles();
+
+            const filteredArticles = category === 'all'
+                ? allArticles
+                : allArticles.filter(article => article.category === category);
+
+            if (filteredArticles.length === 0) {
+                grid.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            noResults.style.display = 'none';
+
+            grid.innerHTML = filteredArticles.map(article => {
+                const pdfLink = article.pdfUrl || article.pdfData;
+                const linkAttrs = pdfLink
+                    ? `href="${pdfLink}" target="_blank" rel="noopener noreferrer"`
+                    : 'href="#"';
+
+                return `
+                <a ${linkAttrs} class="blog-article-card" data-article-id="${article.id}">
+                    <div class="blog-article-image">
+                        <div class="blog-image-placeholder" style="background: ${article.imageColor};">
+                            <i class="fas ${article.icon}"></i>
+                        </div>
+                        <div class="blog-category">${categoryNames[article.category] || 'Genel'}</div>
+                    </div>
+                    <div class="blog-article-content">
+                        <h3 class="blog-article-title">${article.title}</h3>
+                        <p class="blog-article-excerpt">${article.excerpt}</p>
+                        <div class="blog-article-meta">
+                            <span><i class="fas fa-calendar-alt"></i> ${article.date}</span>
+                        </div>
+                        <span class="blog-article-link">
+                            <span>Devamını Oku</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </div>
+                </a>
+            `;
+            }).join('');
+        }
+
+        // Filtre butonları ve ilk yükleme
+        document.addEventListener('DOMContentLoaded', async function() {
+            const params = new URLSearchParams(window.location.search);
+            let initialCategory = params.get('category') || 'all';
+
+            // Geçersiz kategori gelirse 'all' kullan
+            if (initialCategory !== 'all' && !categoryNames[initialCategory]) {
+                initialCategory = 'all';
+            }
+
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    renderArticles(this.getAttribute('data-category'));
+                });
+            });
+
+            // URL'deki kategoriye göre aktif butonu ayarla
+            filterButtons.forEach(btn => {
+                const cat = btn.getAttribute('data-category');
+                if (cat === initialCategory) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            await renderArticles(initialCategory);
+        });
+    </script>
 </body>
 </html>
