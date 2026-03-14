@@ -56,14 +56,15 @@ function showToast(message, type = 'success') {
 function getCategoryLabel(category) {
     const labels = {
         'migren': 'Migren',
-        'alzheimer': 'Alzheimer',
-        'parkinson': 'Parkinson',
-        'bas-agrisi': 'Baş Ağrısı',
-        'epilepsi': 'Epilepsi',
-        'inme': 'İnme',
+        'alzheimer': 'Demans, Alzheimer ve Parkinson',
+        'parkinson': 'Nöropsikoloji',
+        'bas-agrisi': 'Baş Ağrısı, Baş Dönmesi ve Ağrı Blokajları',
+        'epilepsi': 'Epilepsi ve EEG',
+        'inme': 'Serebrovasküler Hastalıklar',
         'botoks': 'Botoks Uygulamaları',
         'agri': 'Ağrı Blokları',
-        'uyku': 'Uyku',
+        'uyku': 'Uyku Bozuklukları',
+        'emg': 'EMG',
         'diger': 'Diğer Nörolojik Hastalıklar',
         'genel': 'Genel'
     };

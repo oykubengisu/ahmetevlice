@@ -288,18 +288,17 @@
         </div>
 
         <div class="container">
-            <!-- Category Filters -->
+            <!-- Category Filters (Uzmanlık alanlarıyla uyumlu) -->
             <div class="blog-filters">
                 <button class="filter-btn active" data-category="all">Tümü</button>
-                <button class="filter-btn" data-category="alzheimer">Alzheimer</button>
-                <button class="filter-btn" data-category="parkinson">Parkinson</button>
-                <button class="filter-btn" data-category="migren">Migren</button>
-                <button class="filter-btn" data-category="uyku">Uyku Bozuklukları</button>
-                <button class="filter-btn" data-category="bas-agrisi">Baş Ağrısı</button>
-                <button class="filter-btn" data-category="hareket">Hareket Bozuklukları</button>
-                <button class="filter-btn" data-category="inme">İnme</button>
+                <button class="filter-btn" data-category="alzheimer">Demans, Alzheimer ve Parkinson</button>
+                <button class="filter-btn" data-category="parkinson">Nöropsikoloji</button>
+                <button class="filter-btn" data-category="bas-agrisi">Baş Ağrısı, Baş Dönmesi ve Ağrı Blokajları</button>
                 <button class="filter-btn" data-category="botoks">Botoks Uygulamaları</button>
-                <button class="filter-btn" data-category="agri">Ağrı Blokları</button>
+                <button class="filter-btn" data-category="uyku">Uyku Bozuklukları</button>
+                <button class="filter-btn" data-category="inme">Serebrovasküler Hastalıklar</button>
+                <button class="filter-btn" data-category="emg">EMG</button>
+                <button class="filter-btn" data-category="epilepsi">Epilepsi ve EEG</button>
                 <button class="filter-btn" data-category="diger">Diğer Nörolojik Hastalıklar</button>
             </div>
 
@@ -397,18 +396,19 @@
     <script>
         const API_BASE_BLOG = ''; // Aynı domain (Vercel)
 
-        // Kategori isimleri
+        // Kategori isimleri (uzmanlık alanlarıyla uyumlu)
         const categoryNames = {
-            'alzheimer': 'Alzheimer',
-            'parkinson': 'Parkinson',
+            'alzheimer': 'Demans, Alzheimer ve Parkinson',
+            'parkinson': 'Nöropsikoloji',
             'migren': 'Migren',
             'uyku': 'Uyku Bozuklukları',
-            'bas-agrisi': 'Baş Ağrısı',
+            'bas-agrisi': 'Baş Ağrısı, Baş Dönmesi ve Ağrı Blokajları',
             'hareket': 'Hareket Bozuklukları',
-            'epilepsi': 'Epilepsi',
-            'inme': 'İnme',
+            'epilepsi': 'Epilepsi ve EEG',
+            'inme': 'Serebrovasküler Hastalıklar',
             'botoks': 'Botoks Uygulamaları',
             'agri': 'Ağrı Blokları',
+            'emg': 'EMG',
             'diger': 'Diğer Nörolojik Hastalıklar',
             'genel': 'Genel'
         };

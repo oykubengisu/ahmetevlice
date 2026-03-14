@@ -559,6 +559,7 @@ async function loadDynamicBlogs() {
         'uyku': 'fas fa-bed',
         'botoks': 'fas fa-syringe',
         'agri': 'fas fa-hand-holding-medical',
+        'emg': 'fas fa-wave-square',
         'diger': 'fas fa-stethoscope',
         'genel': 'fas fa-notes-medical'
     };
@@ -566,13 +567,14 @@ async function loadDynamicBlogs() {
     // Category labels
     const categoryLabels = {
         'migren': 'Migren',
-        'alzheimer': 'Alzheimer',
-        'parkinson': 'Parkinson',
-        'epilepsi': 'Epilepsi',
-        'inme': 'İnme',
-        'uyku': 'Uyku',
+        'alzheimer': 'Demans, Alzheimer ve Parkinson',
+        'parkinson': 'Nöropsikoloji',
+        'epilepsi': 'Epilepsi ve EEG',
+        'inme': 'Serebrovasküler Hastalıklar',
+        'uyku': 'Uyku Bozuklukları',
         'botoks': 'Botoks Uygulamaları',
         'agri': 'Ağrı Blokları',
+        'emg': 'EMG',
         'diger': 'Diğer Nörolojik Hastalıklar',
         'genel': 'Genel'
     };
@@ -606,6 +608,7 @@ async function loadDynamicBlogs() {
             'hareket': 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
             'epilepsi': 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
             'inme': 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+            'emg': 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)',
             'botoks': 'linear-gradient(135deg, #22c55e 0%, #15803d 100%)',
             'agri': 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
             'diger': 'linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%)',
