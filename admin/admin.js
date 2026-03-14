@@ -325,6 +325,22 @@ function initNavigation() {
     const pages = document.querySelectorAll('.page');
     
     function showPage(pageName) {
+        // Özel durumlar: aynı sayfa, farklı görünüm/tür
+        let effectivePage = pageName;
+        let blogScope = null;
+        let newBlogKind = null;
+        if (pageName === 'blogs-blog') {
+            effectivePage = 'blogs';
+            blogScope = 'blog';
+        } else if (pageName === 'blogs') {
+            blogScope = 'makale';
+        } else if (pageName === 'new-blog-blog') {
+            effectivePage = 'new-blog';
+            newBlogKind = 'blog';
+        } else if (pageName === 'new-blog') {
+            newBlogKind = 'makale';
+        }
+        
         // Update nav
         navItems.forEach(item => {
             item.classList.toggle('active', item.dataset.page === pageName);
@@ -332,8 +348,17 @@ function initNavigation() {
         
         // Show page
         pages.forEach(page => {
-            page.classList.toggle('active', page.id === `${pageName}-page`);
+            page.classList.toggle('active', page.id === `${effectivePage}-page`);
         });
+        
+        // Blog scope'u ayarla
+        if (blogScope && window.setBlogsScopeFromNav) {
+            window.setBlogsScopeFromNav(blogScope);
+        }
+        // Yeni yazı türünü ayarla
+        if (newBlogKind && window.setNewBlogKindFromNav) {
+            window.setNewBlogKindFromNav(newBlogKind);
+        }
         
         // Update URL hash
         window.location.hash = pageName;
@@ -483,14 +508,31 @@ function initBlogsPage() {
     scopeTabs.forEach(tab => {
         tab.addEventListener('click', () => {
             const scope = tab.getAttribute('data-blog-scope') || 'makale';
-            currentBlogScope = scope;
-            scopeTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            renderBlogsTable();
+            if (window.setBlogsScopeFromNav) {
+                window.setBlogsScopeFromNav(scope);
+            }
         });
     });
     
-    renderBlogsTable();
+    // Navigation'dan scope değiştirmek için global yardımcı
+    window.setBlogsScopeFromNav = function(scope) {
+        const targetScope = scope || 'makale';
+        currentBlogScope = targetScope;
+        const tabs = document.querySelectorAll('.blogs-tabs .tab-btn');
+        tabs.forEach(t => {
+            const tabScope = t.getAttribute('data-blog-scope') || 'makale';
+            t.classList.toggle('active', tabScope === targetScope);
+        });
+        renderBlogsTable();
+    };
+    
+    // İlk yüklemede, hash'e göre scope seç
+    const hash = window.location.hash.slice(1);
+    if (hash === 'blogs-blog' && window.setBlogsScopeFromNav) {
+        window.setBlogsScopeFromNav('blog');
+    } else if (window.setBlogsScopeFromNav) {
+        window.setBlogsScopeFromNav('makale');
+    }
 }
 
 async function renderBlogsTable() {
@@ -559,6 +601,7 @@ function initBlogForm() {
     const pdfFileName = document.getElementById('pdf-file-name');
     const pdfFileSize = document.getElementById('pdf-file-size');
     const pdfUrlInput = document.getElementById('blog-pdf-url');
+    const kindSelect = document.getElementById('blog-kind');
     
     // Editor toolbar
     initEditor();
@@ -650,6 +693,24 @@ function initBlogForm() {
             if (pdfInput) pdfInput.value = '';
         });
     }
+
+    // Navigation'dan tür set etmek için yardımcı (Yeni Yazı / Yeni Blog Yazısı)
+    window.setNewBlogKindFromNav = function(kind) {
+        const targetKind = kind || 'makale';
+        if (kindSelect) {
+            kindSelect.value = targetKind;
+        }
+        // Başlığı güncelle
+        const titleEl = document.getElementById('blog-form-title');
+        if (titleEl) {
+            titleEl.textContent = targetKind === 'blog' ? 'Yeni Blog Yazısı' : 'Yeni Makale';
+        }
+        // Yeni yazıya gelirken formu temizle
+        resetBlogForm();
+        if (kindSelect) {
+            kindSelect.value = targetKind;
+        }
+    };
 }
 
 function initEditor() {

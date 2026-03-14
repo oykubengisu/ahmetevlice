@@ -492,13 +492,10 @@
             noResults.style.display = 'none';
 
             grid.innerHTML = filteredArticles.map(article => {
-                const pdfLink = article.pdfUrl || article.pdfData;
-                const linkAttrs = pdfLink
-                    ? `href="${pdfLink}" target="_blank" rel="noopener noreferrer"`
-                    : 'href="#"';
+                const detailUrl = `/blog-yazisi.html?id=${encodeURIComponent(article.id)}`;
 
                 return `
-                <a ${linkAttrs} class="blog-article-card" data-article-id="${article.id}">
+                <a href="${detailUrl}" class="blog-article-card" data-article-id="${article.id}">
                     <div class="blog-article-image">
                         <div class="blog-image-placeholder" style="background: ${article.imageColor};">
                             <i class="fas ${article.icon}"></i>

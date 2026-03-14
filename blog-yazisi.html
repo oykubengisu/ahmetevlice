@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Yazısı - Prof. Dr. Ahmet Evlice | Nöroloji Uzmanı</title>
+    <link rel="canonical" href="https://ahmetevlice.com/blog">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-92G2VK28F2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-92G2VK28F2');
+    </script>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        .blog-detail-page {
+            padding-top: 120px;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        .blog-detail-header {
+            padding: 60px 0 30px;
+        }
+
+        .blog-detail-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--gray);
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+
+        .blog-detail-back i {
+            font-size: 12px;
+        }
+
+        .blog-detail-category {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .blog-detail-title {
+            font-size: 34px;
+            line-height: 1.3;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .blog-detail-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .blog-detail-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .blog-detail-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--light-gray);
+            margin-bottom: 60px;
+        }
+
+        .blog-detail-content {
+            font-size: 16px;
+            line-height: 1.9;
+            color: var(--text-color);
+        }
+
+        .blog-detail-content h2,
+        .blog-detail-content h3,
+        .blog-detail-content h4 {
+            margin-top: 28px;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .blog-detail-content p {
+            margin-bottom: 18px;
+        }
+
+        .blog-detail-content ul,
+        .blog-detail-content ol {
+            padding-left: 1.4rem;
+            margin-bottom: 18px;
+        }
+
+        .blog-detail-content li {
+            margin-bottom: 6px;
+        }
+
+        .blog-detail-content a {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        .blog-detail-content blockquote {
+            margin: 24px 0;
+            padding: 16px 20px;
+            border-left: 4px solid var(--accent);
+            background: rgba(15, 118, 110, 0.03);
+            border-radius: 0 12px 12px 0;
+        }
+
+        @media screen and (max-width: 768px) {
+            .blog-detail-title {
+                font-size: 26px;
+            }
+
+            .blog-detail-card {
+                padding: 24px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-icon"></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="/" class="nav-logo">
+                <span class="logo-text">Prof. Dr.</span>
+                <span class="logo-name">AHMET EVLİCE</span>
+                <span class="logo-title">Nöroloji Uzmanı</span>
+            </a>
+
+            <div class="nav-menu" id="nav-menu">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Anasayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/#about" class="nav-link">Hakkımda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/#expertise" class="nav-link">Uzmanlık Alanları</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/makaleler" class="nav-link">Makaleler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/blog" class="nav-link active">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/#media" class="nav-link">Basında Biz</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/#contact" class="nav-link">İletişim</a>
+                    </li>
+                </ul>
+                <div class="nav-close" id="nav-close">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+
+            <div class="nav-actions">
+                <div class="nav-social">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/prof.dr.ahmetevlice/" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                </div>
+                <button class="theme-toggle" id="theme-toggle" title="Tema Değiştir">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+                <div class="nav-toggle" id="nav-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="blog-detail-page">
+        <section class="container">
+            <div class="blog-detail-header">
+                <a href="/blog" class="blog-detail-back">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Tüm blog yazılarına dön</span>
+                </a>
+
+                <div class="blog-detail-category" id="blog-category-badge" style="display:none;">
+                    <i class="fas fa-brain"></i>
+                    <span id="blog-category-text">Kategori</span>
+                </div>
+
+                <h1 class="blog-detail-title" id="blog-title">
+                    Blog yazısı yükleniyor...
+                </h1>
+
+                <div class="blog-detail-meta">
+                    <span>
+                        <i class="fas fa-calendar-alt"></i>
+                        <span id="blog-date"></span>
+                    </span>
+                    <span>
+                        <i class="fas fa-clock"></i>
+                        <span id="blog-read-time"></span>
+                    </span>
+                </div>
+            </div>
+
+            <article class="blog-detail-card">
+                <div class="blog-detail-content" id="blog-content">
+                    <p>Blog içeriği yükleniyor...</p>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="/" class="footer-logo">
+                        <span class="logo-text">Prof. Dr.</span>
+                        <span class="logo-name">AHMET EVLİCE</span>
+                    </a>
+                    <p class="footer-description">
+                        Beyin ve sinir hastalıkları alanında 30 yılı aşkın deneyim ile 
+                        hastalarına en iyi hizmeti sunmaktadır.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/prof.dr.ahmetevlice/" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Hızlı Linkler</h4>
+                    <ul>
+                        <li><a href="/">Anasayfa</a></li>
+                        <li><a href="/#about">Hakkımda</a></li>
+                        <li><a href="/#expertise">Uzmanlık Alanları</a></li>
+                        <li><a href="/#media">Basında Biz</a></li>
+                        <li><a href="/blog">Blog</a></li>
+                        <li><a href="/#contact">İletişim</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Uzmanlık Alanları</h4>
+                    <ul>
+                        <li><a href="/#expertise">Baş Ağrısı & Migren</a></li>
+                        <li><a href="/#expertise">Hareket Bozuklukları</a></li>
+                        <li><a href="/#expertise">Alzheimer & Demans</a></li>
+                        <li><a href="/#expertise">Elektrofizyoloji</a></li>
+                        <li><a href="/#expertise">Botoks Uygulamaları</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h4>İletişim</h4>
+                    <ul>
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span class="footer-address">Ortadoğu Hastanesi, Adana</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:05455254470" class="phone-link">0545 525 4470</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Prof. Dr. Ahmet Evlice. Tüm hakları saklıdır.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Button -->
+    <a href="#" class="whatsapp-btn" id="whatsapp-btn" target="_blank" rel="noopener noreferrer" onclick="return false;">
+        <i class="fab fa-whatsapp"></i>
+        <span>WhatsApp</span>
+    </a>
+
+    <!-- Back to Top -->
+    <a href="#header" class="back-to-top" id="back-to-top">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+
+    <script src="script.js"></script>
+    <script>
+        const API_BASE_BLOG = ''; // Aynı domain (Vercel)
+
+        const categoryNames = {
+            'alzheimer': 'Alzheimer',
+            'parkinson': 'Parkinson',
+            'migren': 'Migren',
+            'uyku': 'Uyku Bozuklukları',
+            'bas-agrisi': 'Baş Ağrısı',
+            'hareket': 'Hareket Bozuklukları',
+            'epilepsi': 'Epilepsi',
+            'inme': 'İnme',
+            'botoks': 'Botoks Uygulamaları',
+            'agri': 'Ağrı Blokları',
+            'diger': 'Diğer Nörolojik Hastalıklar',
+            'genel': 'Genel'
+        };
+
+        const categoryIcons = {
+            'alzheimer': 'fa-brain',
+            'parkinson': 'fa-user-injured',
+            'migren': 'fa-head-side-virus',
+            'uyku': 'fa-bed',
+            'bas-agrisi': 'fa-head-side-virus',
+            'hareket': 'fa-walking',
+            'epilepsi': 'fa-bolt',
+            'inme': 'fa-heartbeat',
+            'botoks': 'fa-syringe',
+            'agri': 'fa-hand-holding-medical',
+            'diger': 'fa-stethoscope',
+            'genel': 'fa-notes-medical'
+        };
+
+        function formatBlogDate(dateStr) {
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return '';
+            return date.toLocaleDateString('tr-TR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        async function loadBlogDetail() {
+            const params = new URLSearchParams(window.location.search);
+            const idParam = params.get('id');
+
+            const titleEl = document.getElementById('blog-title');
+            const dateEl = document.getElementById('blog-date');
+            const readTimeEl = document.getElementById('blog-read-time');
+            const contentEl = document.getElementById('blog-content');
+            const categoryBadge = document.getElementById('blog-category-badge');
+            const categoryText = document.getElementById('blog-category-text');
+
+            if (!idParam) {
+                titleEl.textContent = 'Blog yazısı bulunamadı';
+                contentEl.innerHTML = '<p>Geçersiz bağlantı. Lütfen blog sayfası üzerinden tekrar deneyin.</p>';
+                return;
+            }
+
+            let blogs = [];
+            try {
+                const r = await fetch(API_BASE_BLOG + '/api/blogs');
+                if (r.ok) blogs = await r.json();
+                else throw new Error();
+            } catch (e) {
+                const raw = localStorage.getItem('blog_posts');
+                if (raw) {
+                    try { blogs = JSON.parse(raw); } catch (err) {}
+                }
+            }
+
+            const blog = blogs
+                .filter(b => b.status === 'published')
+                .filter(b => (b.kind || 'makale') === 'blog')
+                .find((b, index) => {
+                    const storedId = b.id != null ? String(b.id) : null;
+                    if (storedId && storedId === idParam) return true;
+                    // Eski kayıtlarda id yoksa index ile eşleştir
+                    return String(index) === idParam;
+                });
+
+            if (!blog) {
+                titleEl.textContent = 'Blog yazısı bulunamadı';
+                contentEl.innerHTML = '<p>Bu blog yazısı yayında değil veya bulunamadı.</p>';
+                return;
+            }
+
+            // SEO başlık ve açıklama
+            const pageTitle = blog.metaTitle || (blog.title + ' - Blog - Prof. Dr. Ahmet Evlice');
+            document.title = pageTitle;
+            const metaDesc = blog.metaDescription || blog.excerpt;
+            if (metaDesc) {
+                let meta = document.querySelector('meta[name="description"]');
+                if (!meta) {
+                    meta = document.createElement('meta');
+                    meta.name = 'description';
+                    document.head.appendChild(meta);
+                }
+                meta.content = metaDesc;
+            }
+
+            titleEl.textContent = blog.title;
+            dateEl.textContent = formatBlogDate(blog.date || blog.createdAt);
+            readTimeEl.textContent = (blog.readTime || 5) + ' dk okuma';
+
+            const categoryKey = blog.category || 'genel';
+            const categoryName = categoryNames[categoryKey] || 'Genel';
+            categoryText.textContent = categoryName;
+            const iconClass = categoryIcons[categoryKey] || 'fa-notes-medical';
+            categoryBadge.innerHTML = '<i class="fas ' + iconClass + '"></i><span id="blog-category-text">' + categoryName + '</span>';
+            categoryBadge.style.display = 'inline-flex';
+
+            // İçeriği HTML olarak bas (admin panelinde zengin metin olarak giriliyor)
+            contentEl.innerHTML = blog.content || '<p>' + (blog.excerpt || '') + '</p>';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadBlogDetail);
+    </script>
+</body>
+</html>
+

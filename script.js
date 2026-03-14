@@ -589,12 +589,12 @@ async function loadDynamicBlogs() {
     
     // Generate HTML for each blog
     const blogsHTML = blogs.map((blog, index) => {
+        const id = blog.id != null ? blog.id : index;
         const icon = categoryIcons[blog.category] || 'fas fa-newspaper';
         const label = categoryLabels[blog.category] || blog.category;
         const delay = ((index % 3) + 1) * 100;
-        const pdfLink = blog.pdfUrl || blog.pdfData;
-        const hasPdf = !!pdfLink;
-        const linkAttrs = hasPdf ? `href="${pdfLink}" target="_blank"` : 'href="#"';
+        const detailUrl = `/blog-yazisi.html?id=${encodeURIComponent(id)}`;
+        const linkAttrs = `href="${detailUrl}"`;
 
         // Aynı kategori görsellerini blog.html ile eşleştirmek için arka plan renkleri
         const categoryColors = {
