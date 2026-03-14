@@ -65,6 +65,7 @@ function getCategoryLabel(category) {
         'agri': 'Ağrı Blokları',
         'uyku': 'Uyku Bozuklukları',
         'emg': 'EMG',
+        'bilgilendirme': 'Bilgilendirme',
         'diger': 'Diğer Nörolojik Hastalıklar',
         'genel': 'Genel'
     };
