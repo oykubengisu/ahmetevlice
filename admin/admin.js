@@ -122,7 +122,8 @@ function saveBlogsToLocal(blogs) {
 
 async function getBlog(id) {
     const blogs = await getBlogs();
-    return blogs.find(blog => blog.id === id);
+    const idStr = id != null ? String(id) : '';
+    return blogs.find(blog => String(blog.id) === idStr || blog.id === id);
 }
 
 async function saveBlog(blog) {
@@ -699,18 +700,18 @@ function initBlogForm() {
     // Navigation'dan tür set etmek için yardımcı (Yeni Yazı / Yeni Blog Yazısı)
     window.setNewBlogKindFromNav = function(kind) {
         const targetKind = kind || 'makale';
-        if (kindSelect) {
+        const blogIdEl = document.getElementById('blog-id');
+        const isEditing = blogIdEl && blogIdEl.value && blogIdEl.value.trim() !== '';
+        if (!isEditing && kindSelect) {
             kindSelect.value = targetKind;
         }
-        // Başlığı güncelle
         const titleEl = document.getElementById('blog-form-title');
         if (titleEl) {
-            titleEl.textContent = targetKind === 'blog' ? 'Yeni Blog Yazısı' : 'Yeni Makale';
+            titleEl.textContent = isEditing ? 'Yazıyı Düzenle' : (targetKind === 'blog' ? 'Yeni Blog Yazısı' : 'Yeni Makale');
         }
-        // Yeni yazıya gelirken formu temizle
-        resetBlogForm();
-        if (kindSelect) {
-            kindSelect.value = targetKind;
+        if (!isEditing) {
+            resetBlogForm();
+            if (kindSelect) kindSelect.value = targetKind;
         }
     };
 }
