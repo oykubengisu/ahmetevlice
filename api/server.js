@@ -250,6 +250,7 @@ app.post('/api/media', requireAuth, (req, res) => {
   data.media_gallery = [
     {
       ...item,
+      description: (item.description || '').toString(),
       id,
       uploadedAt: now
     },
@@ -258,6 +259,24 @@ app.post('/api/media', requireAuth, (req, res) => {
 
   saveData(data);
   res.json({ ok: true, item: data.media_gallery.find(m => m.id === id) });
+});
+
+app.put('/api/media/:id', requireAuth, (req, res) => {
+  const { id } = req.params;
+  const data = loadData();
+  const media = data.media_gallery || [];
+  const idx = media.findIndex(m => m.id === id);
+  if (idx === -1) {
+    return res.status(404).json({ error: 'Öğe bulunamadı' });
+  }
+  const body = req.body || {};
+  media[idx] = {
+    ...media[idx],
+    description: body.description !== undefined ? String(body.description || '') : media[idx].description
+  };
+  data.media_gallery = media;
+  saveData(data);
+  res.json({ ok: true, item: media[idx] });
 });
 
 app.delete('/api/media/:id', requireAuth, (req, res) => {

@@ -1226,7 +1226,8 @@ function handleMediaUpload(files) {
                 name: file.name,
                 size: formatFileSize(file.size),
                 type: file.type,
-                data: e.target.result
+                data: e.target.result,
+                description: ''
             };
             try {
                 const res = await fetchWithRetry(API_BASE + '/api/media', {
@@ -1276,8 +1277,12 @@ async function renderMediaGallery() {
                 <div class="media-item-info">
                     <div class="media-item-name">${item.name}</div>
                     <div class="media-item-size">${item.size}</div>
+                    <div class="media-item-size">${item.description ? item.description : 'Açıklama yok'}</div>
                 </div>
                 <div class="media-item-actions">
+                    <button onclick="editMediaDescription('${item.id}')" title="Açıklama Düzenle">
+                        <i class="fas fa-pen"></i>
+                    </button>
                     <button onclick="copyMediaUrl('${item.id}')" title="URL Kopyala">
                         <i class="fas fa-link"></i>
                     </button>
@@ -1295,6 +1300,27 @@ window.copyMediaUrl = function(id) {
     if (item && item.data) {
         navigator.clipboard.writeText(item.data).then(() => showToast('URL kopyalandı!', 'success'));
     }
+};
+
+window.editMediaDescription = async function(id) {
+    const item = mediaItemsCache.find(m => m.id === id);
+    if (!item) return;
+    const current = item.description || '';
+    const next = prompt('Fotoğraf açıklamasını girin:', current);
+    if (next === null) return;
+    try {
+        const r = await fetchWithRetry(API_BASE + '/api/media/' + encodeURIComponent(id), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+            body: JSON.stringify({ description: next.trim() })
+        });
+        if (r.status === 401) { logout(); return; }
+        if (!r.ok) throw new Error();
+        showToast('Açıklama güncellendi!', 'success');
+    } catch (e) {
+        showToast('Açıklama güncellenemedi. Lütfen tekrar deneyin.', 'error');
+    }
+    renderMediaGallery();
 };
 
 window.deleteMedia = async function(id) {
