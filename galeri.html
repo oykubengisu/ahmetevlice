@@ -233,9 +233,9 @@
             }
 
             grid.innerHTML = items.map(item => `
-                <figure class="gallery-item" data-src="${item.data}" data-name="${escapeHtml(item.name || 'Galeri görseli')}" data-description="${escapeHtml(item.description || '')}">
+                <figure class="gallery-item" data-src="${item.data}" data-name="${escapeHtml(item.name || 'Galeri görseli')}" data-description="${escapeHtml(item.description || item.name || '')}">
                     <img src="${item.data}" alt="${escapeHtml(item.name || 'Galeri görseli')}" loading="lazy" decoding="async">
-                    <figcaption class="gallery-caption">${item.description ? escapeHtml(item.description) : 'Açıklama eklenmemiş.'}</figcaption>
+                    <figcaption class="gallery-caption">${item.description ? escapeHtml(item.description) : escapeHtml(item.name || 'Açıklama eklenmemiş.')}</figcaption>
                 </figure>
             `).join('');
             empty.style.display = 'none';
