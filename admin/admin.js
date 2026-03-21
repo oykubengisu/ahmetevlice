@@ -755,6 +755,8 @@ async function saveBlogPost(status) {
     const kind = kindSelect ? (kindSelect.value || 'makale') : 'makale';
     const date = document.getElementById('blog-date').value;
     const readTime = document.getElementById('blog-read-time').value;
+    const metaTitle = document.getElementById('blog-meta-title')?.value.trim() || '';
+    const metaDesc = document.getElementById('blog-meta-desc')?.value.trim() || '';
     const image = document.getElementById('featured-image-preview').src;
     const pdfUrl = document.getElementById('blog-pdf-url')?.value.trim() || '';
     
@@ -772,6 +774,10 @@ async function saveBlogPost(status) {
         kind,
         date: date || new Date().toISOString(),
         readTime: parseInt(readTime) || 5,
+        metaTitle,
+        // Yeni detay sayfası metaDescription bekliyor; geriye dönük uyum için metaDesc de saklanır
+        metaDescription: metaDesc,
+        metaDesc,
         image: image || '',
         // Eğer PDF URL girildiyse onu kullan, aksi halde (varsa) base64 PDF'i sakla
         pdfUrl: pdfUrl || '',
@@ -847,6 +853,8 @@ window.editBlog = async function(id) {
     document.getElementById('blog-category').value = blog.category;
     document.getElementById('blog-date').value = formatDateInput(blog.date);
     document.getElementById('blog-read-time').value = blog.readTime || 5;
+    document.getElementById('blog-meta-title').value = blog.metaTitle || '';
+    document.getElementById('blog-meta-desc').value = blog.metaDescription || blog.metaDesc || '';
     
     if (blog.image) {
         const imagePreview = document.getElementById('featured-image-preview');
