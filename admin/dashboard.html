@@ -765,6 +765,32 @@
             </div>
         </div>
     </div>
+
+    <!-- Edit Media Modal -->
+    <div class="modal" id="edit-media-modal">
+        <div class="modal-content" style="max-width: 560px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-pen"></i> Medya Düzenle</h3>
+                <button class="modal-close" id="edit-media-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex; gap:16px; align-items:flex-start;">
+                    <img id="edit-media-preview" alt="Önizleme" style="width:120px; height:120px; object-fit:cover; border-radius: var(--radius-md); background: var(--admin-card); border: 1px solid var(--admin-border);"/>
+                    <div style="flex:1;">
+                        <div class="text-muted" id="edit-media-name" style="margin-bottom:10px;">-</div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label for="edit-media-description" style="display:block; margin-bottom:8px; font-weight:600;">Açıklama (tek satır)</label>
+                            <input type="text" id="edit-media-description" placeholder="Örn: Diş ağrısı için bilgilendirici görsel" style="width:100%;"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-edit-media">İptal</button>
+                <button class="btn btn-primary" id="confirm-edit-media">Kaydet</button>
+            </div>
+        </div>
+    </div>
     
     <!-- Toast Notification -->
     <div class="toast" id="toast">

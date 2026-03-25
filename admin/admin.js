@@ -285,6 +285,7 @@ async function initDashboardPage() {
     initMediaGallery();
     initSettings();
     initDeleteModal();
+    initEditMediaModal();
     
     // Set default date for new blog
     const blogDate = document.getElementById('blog-date');
@@ -953,6 +954,74 @@ window.confirmDelete = function(id) {
 };
 
 // ========================================
+// Edit Media Modal
+// ========================================
+let mediaToEdit = null;
+
+function initEditMediaModal() {
+    const modal = document.getElementById('edit-media-modal');
+    const closeBtn = document.getElementById('edit-media-modal-close');
+    const cancelBtn = document.getElementById('cancel-edit-media');
+    const confirmBtn = document.getElementById('confirm-edit-media');
+
+    const previewImg = document.getElementById('edit-media-preview');
+    const nameEl = document.getElementById('edit-media-name');
+    const descriptionInput = document.getElementById('edit-media-description');
+
+    if (!modal || !descriptionInput || !confirmBtn) return;
+
+    const closeModal = () => {
+        modal.classList.remove('show');
+        mediaToEdit = null;
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    confirmBtn.addEventListener('click', async () => {
+        if (!mediaToEdit) {
+            closeModal();
+            return;
+        }
+
+        const next = (descriptionInput.value || '').trim();
+        try {
+            const r = await fetchWithRetry(API_BASE + '/api/media/' + encodeURIComponent(mediaToEdit), {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+                body: JSON.stringify({ description: next })
+            });
+            if (r.status === 401) { logout(); return; }
+            if (!r.ok) throw new Error();
+
+            showToast('Açıklama güncellendi!', 'success');
+            closeModal();
+            renderMediaGallery();
+        } catch (e) {
+            showToast('Açıklama güncellenemedi. Lütfen tekrar deneyin.', 'error');
+        }
+    });
+
+    // expose open function globally for onclick handlers
+    window.openEditMediaModal = function(id) {
+        const item = mediaItemsCache.find(m => m.id === id);
+        if (!item) return;
+
+        mediaToEdit = id;
+        if (previewImg) previewImg.src = item.data;
+        if (nameEl) nameEl.textContent = item.name || '-';
+        descriptionInput.value = item.description || '';
+
+        modal.classList.add('show');
+        setTimeout(() => descriptionInput.focus(), 0);
+    };
+}
+
+// ========================================
 // Pages Content Management
 // ========================================
 function initPagesContent() {
@@ -1303,24 +1372,9 @@ window.copyMediaUrl = function(id) {
 };
 
 window.editMediaDescription = async function(id) {
-    const item = mediaItemsCache.find(m => m.id === id);
-    if (!item) return;
-    const current = item.description || '';
-    const next = prompt('Fotoğraf açıklamasını girin:', current);
-    if (next === null) return;
-    try {
-        const r = await fetchWithRetry(API_BASE + '/api/media/' + encodeURIComponent(id), {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-            body: JSON.stringify({ description: next.trim() })
-        });
-        if (r.status === 401) { logout(); return; }
-        if (!r.ok) throw new Error();
-        showToast('Açıklama güncellendi!', 'success');
-    } catch (e) {
-        showToast('Açıklama güncellenemedi. Lütfen tekrar deneyin.', 'error');
+    if (window.openEditMediaModal) {
+        window.openEditMediaModal(id);
     }
-    renderMediaGallery();
 };
 
 window.deleteMedia = async function(id) {
