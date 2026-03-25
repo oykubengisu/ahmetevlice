@@ -1008,13 +1008,19 @@ function initEditMediaModal() {
 
     // expose open function globally for onclick handlers
     window.openEditMediaModal = function(id) {
-        const item = mediaItemsCache.find(m => m.id === id);
-        if (!item) return;
-
+        // Cache hazır değilse bile modalı açalım (kullanıcı açıklamayı yazıp Kaydet'e basabilsin)
         mediaToEdit = id;
-        if (previewImg) previewImg.src = item.data;
-        if (nameEl) nameEl.textContent = item.name || '-';
-        descriptionInput.value = item.description || '';
+
+        const item = (mediaItemsCache || []).find(m => String(m.id) === String(id));
+        if (item) {
+            if (previewImg) previewImg.src = item.data;
+            if (nameEl) nameEl.textContent = item.name || '-';
+            descriptionInput.value = item.description || '';
+        } else {
+            if (nameEl) nameEl.textContent = '-';
+            if (previewImg) previewImg.removeAttribute('src');
+            descriptionInput.value = '';
+        }
 
         modal.classList.add('show');
         setTimeout(() => descriptionInput.focus(), 0);
@@ -1372,8 +1378,30 @@ window.copyMediaUrl = function(id) {
 };
 
 window.editMediaDescription = async function(id) {
+    // Primary flow: modal
     if (window.openEditMediaModal) {
         window.openEditMediaModal(id);
+        return;
+    }
+
+    // Fallback: prompt (önceki davranış)
+    const item = (mediaItemsCache || []).find(m => String(m.id) === String(id));
+    const current = (item && item.description) ? item.description : '';
+    const next = prompt('Fotoğraf açıklamasını girin:', current);
+    if (next === null) return;
+
+    try {
+        const r = await fetchWithRetry(API_BASE + '/api/media/' + encodeURIComponent(id), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+            body: JSON.stringify({ description: next.trim() })
+        });
+        if (r.status === 401) { logout(); return; }
+        if (!r.ok) throw new Error();
+        showToast('Açıklama güncellendi!', 'success');
+        renderMediaGallery();
+    } catch (e) {
+        showToast('Açıklama güncellenemedi. Lütfen tekrar deneyin.', 'error');
     }
 };
 
