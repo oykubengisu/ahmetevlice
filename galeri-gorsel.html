@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri Görseli - Prof. Dr. Ahmet Evlice</title>
+    <meta name="description" content="Galeri görseli detay sayfası.">
+    <link rel="canonical" href="https://ahmetevlice.com/galeri-gorsel">
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-92G2VK28F2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-92G2VK28F2');
+    </script>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .gallery-detail-page {
+            padding-top: 120px;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        .gallery-detail-header {
+            padding: 50px 0 30px;
+            border-bottom: 1px solid var(--light-gray);
+            background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(30, 64, 175, 0.08));
+        }
+
+        .gallery-detail-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--gray);
+            text-decoration: none;
+            margin-bottom: 16px;
+        }
+
+        .gallery-detail-back i { font-size: 12px; }
+
+        .gallery-detail-title {
+            font-size: 34px;
+            line-height: 1.3;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .gallery-detail-card {
+            background: var(--white);
+            border: 1px solid var(--light-gray);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 22px;
+            margin: 30px auto 70px;
+            max-width: 980px;
+        }
+
+        .gallery-detail-media {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .gallery-detail-media img {
+            width: 100%;
+            max-height: 74vh;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+            background: rgba(248, 250, 252, 0.6);
+        }
+
+        .gallery-detail-caption {
+            height: 26px;
+            min-height: 26px;
+            padding: 0 14px;
+            display: flex;
+            align-items: center;
+            color: var(--primary);
+            background: linear-gradient(180deg, rgba(248, 250, 252, 0.7), rgba(248, 250, 252, 1));
+            border-top: 1px solid rgba(226, 232, 240, 0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 13px;
+        }
+
+        .gallery-detail-empty {
+            text-align: center;
+            padding: 70px 20px;
+            color: var(--gray);
+        }
+    </style>
+</head>
+<body>
+    <div class="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-icon"></div>
+        </div>
+    </div>
+
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="/" class="nav-logo">
+                <span class="logo-text">Prof. Dr.</span>
+                <span class="logo-name">AHMET EVLİCE</span>
+                <span class="logo-title">Nöroloji Uzmanı</span>
+            </a>
+
+            <div class="nav-menu" id="nav-menu">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="/" class="nav-link">Anasayfa</a></li>
+                    <li class="nav-item"><a href="/#about" class="nav-link">Hakkımda</a></li>
+                    <li class="nav-item"><a href="/#expertise" class="nav-link">Uzmanlık Alanları</a></li>
+                    <li class="nav-item"><a href="/makaleler" class="nav-link">Makaleler</a></li>
+                    <li class="nav-item"><a href="/blog" class="nav-link">Blog</a></li>
+                    <li class="nav-item"><a href="/galeri" class="nav-link">Galeri</a></li>
+                    <li class="nav-item"><a href="/randevu" class="nav-link">İletişim</a></li>
+                </ul>
+                <div class="nav-close" id="nav-close"><i class="fas fa-times"></i></div>
+            </div>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="theme-toggle" title="Tema Değiştir">
+                    <i class="fas fa-moon"></i><i class="fas fa-sun"></i>
+                </button>
+                <div class="nav-toggle" id="nav-toggle"><i class="fas fa-bars"></i></div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="gallery-detail-page">
+        <section class="gallery-detail-header">
+            <div class="container">
+                <a href="/galeri" class="gallery-detail-back">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Galeriye dön</span>
+                </a>
+                <h1 class="gallery-detail-title" id="gallery-detail-title">Görsel yükleniyor...</h1>
+            </div>
+        </section>
+
+        <section class="container">
+            <div class="gallery-detail-card" id="gallery-detail-card" style="display:none;">
+                <div class="gallery-detail-media">
+                    <img id="gallery-detail-image" alt="Galeri görseli">
+                    <div class="gallery-detail-caption" id="gallery-detail-caption"></div>
+                </div>
+            </div>
+
+            <div class="gallery-detail-empty" id="gallery-detail-empty" style="display:none;">
+                <i class="fas fa-images" style="font-size:52px; opacity:0.35; margin-bottom:14px;"></i>
+                <h3 style="margin-bottom:10px;">Görsel bulunamadı</h3>
+                <p>Bağlantı geçersiz veya görsel kaldırılmış olabilir.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        const API_BASE_GALLERY = '';
+
+        async function loadGalleryImage() {
+            const params = new URLSearchParams(window.location.search);
+            const idParam = params.get('id');
+
+            const titleEl = document.getElementById('gallery-detail-title');
+            const cardEl = document.getElementById('gallery-detail-card');
+            const emptyEl = document.getElementById('gallery-detail-empty');
+            const imageEl = document.getElementById('gallery-detail-image');
+            const captionEl = document.getElementById('gallery-detail-caption');
+
+            if (!idParam) {
+                titleEl.textContent = 'Görsel bulunamadı';
+                cardEl.style.display = 'none';
+                emptyEl.style.display = 'block';
+                return;
+            }
+
+            let items = [];
+            try {
+                const r = await fetch(API_BASE_GALLERY + '/api/media');
+                if (!r.ok) throw new Error('API error');
+                items = await r.json();
+            } catch (e) {
+                const raw = localStorage.getItem('media_gallery');
+                if (raw) {
+                    try { items = JSON.parse(raw); } catch (err) { items = []; }
+                }
+            }
+
+            const media = (items || []).find(m => String(m.id) === String(idParam));
+
+            if (!media) {
+                titleEl.textContent = 'Görsel bulunamadı';
+                cardEl.style.display = 'none';
+                emptyEl.style.display = 'block';
+                return;
+            }
+
+            titleEl.textContent = media.name || 'Galeri görseli';
+            imageEl.src = media.data;
+            imageEl.alt = media.name || 'Galeri görseli';
+            captionEl.textContent = media.description && String(media.description).trim() !== ''
+                ? String(media.description)
+                : (media.name || 'Açıklama eklenmemiş.');
+
+            cardEl.style.display = 'block';
+            emptyEl.style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadGalleryImage);
+    </script>
+</body>
+</html>
+

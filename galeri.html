@@ -81,15 +81,17 @@
             background: var(--white);
             border: 1px solid var(--light-gray);
             box-shadow: 0 8px 24px rgba(2, 6, 23, 0.06);
-            cursor: zoom-in;
+            cursor: pointer;
             display: flex;
             flex-direction: column;
             transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
         }
         .gallery-item img {
             width: 100%;
-            height: auto;
+            height: 190px;
             display: block;
+            object-fit: contain;
+            background: rgba(248, 250, 252, 0.6);
             transition: transform .3s ease;
         }
         .gallery-item:hover img {
@@ -101,13 +103,16 @@
             box-shadow: 0 16px 32px rgba(2, 6, 23, 0.12);
         }
         .gallery-caption {
-            padding: 12px 14px;
+            padding: 6px 14px;
             font-size: 13px;
             color: var(--primary);
-            line-height: 1.5;
-            min-height: 52px;
+            line-height: 1.3;
+            min-height: 26px;
             background: linear-gradient(180deg, rgba(248, 250, 252, 0.7), rgba(248, 250, 252, 1));
             border-top: 1px solid rgba(226, 232, 240, 0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .empty-gallery {
             text-align: center;
@@ -166,6 +171,8 @@
         @media (max-width: 640px) {
             .gallery-title { font-size: 34px; }
             .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .gallery-item img { height: 150px; }
+            .gallery-caption { min-height: 24px; }
         }
     </style>
 </head>
@@ -229,16 +236,6 @@
         </section>
     </main>
 
-    <div class="gallery-lightbox" id="gallery-lightbox" aria-hidden="true">
-        <button class="gallery-lightbox-close" id="gallery-lightbox-close" aria-label="Kapat">
-            <i class="fas fa-times"></i>
-        </button>
-        <div>
-            <img id="gallery-lightbox-image" alt="Galeri görseli">
-            <div class="gallery-lightbox-caption" id="gallery-lightbox-caption"></div>
-        </div>
-    </div>
-
     <script src="script.js"></script>
     <script>
         const API_BASE_GALLERY = '';
@@ -273,47 +270,30 @@
             if (count) count.innerHTML = '<i class="fas fa-images"></i><span>' + items.length + ' fotograf</span>';
 
             grid.innerHTML = items.map(item => `
-                <figure class="gallery-item" data-src="${item.data}" data-name="${escapeHtml(item.name || 'Galeri görseli')}" data-description="${escapeHtml(item.description || item.name || '')}">
+                <figure class="gallery-item" data-id="${item.id || ''}" role="link" tabindex="0">
                     <img src="${item.data}" alt="${escapeHtml(item.name || 'Galeri görseli')}" loading="lazy" decoding="async">
                     <figcaption class="gallery-caption">${item.description ? escapeHtml(item.description) : escapeHtml(item.name || 'Açıklama eklenmemiş.')}</figcaption>
                 </figure>
             `).join('');
             empty.style.display = 'none';
-            initLightbox();
+            initGalleryLinks();
         }
 
-        function initLightbox() {
-            const lightbox = document.getElementById('gallery-lightbox');
-            const lightboxImg = document.getElementById('gallery-lightbox-image');
-            const lightboxCaption = document.getElementById('gallery-lightbox-caption');
-            const closeBtn = document.getElementById('gallery-lightbox-close');
+        function initGalleryLinks() {
+            const openDetail = (el) => {
+                const id = el.getAttribute('data-id');
+                if (!id) return;
+                window.location.href = `/galeri-gorsel.html?id=${encodeURIComponent(id)}`;
+            };
 
-            document.querySelectorAll('.gallery-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const src = item.getAttribute('data-src');
-                    const alt = item.getAttribute('data-name');
-                    const description = item.getAttribute('data-description') || '';
-                    lightboxImg.src = src;
-                    lightboxImg.alt = alt;
-                    lightboxCaption.textContent = description;
-                    lightbox.classList.add('show');
-                    lightbox.setAttribute('aria-hidden', 'false');
+            document.querySelectorAll('.gallery-item[data-id]').forEach(item => {
+                item.addEventListener('click', () => openDetail(item));
+                item.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openDetail(item);
+                    }
                 });
-            });
-
-            function closeLightbox() {
-                lightbox.classList.remove('show');
-                lightbox.setAttribute('aria-hidden', 'true');
-                lightboxImg.src = '';
-                lightboxCaption.textContent = '';
-            }
-
-            closeBtn.addEventListener('click', closeLightbox);
-            lightbox.addEventListener('click', (e) => {
-                if (e.target === lightbox) closeLightbox();
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && lightbox.classList.contains('show')) closeLightbox();
             });
         }
 
