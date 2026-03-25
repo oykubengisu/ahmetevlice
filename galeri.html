@@ -74,7 +74,7 @@
             gap: 18px;
             margin-bottom: 70px;
         }
-        .gallery-item {
+        .gallery-page .gallery-item {
             position: relative;
             border-radius: 14px;
             overflow: hidden;
@@ -84,31 +84,29 @@
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            aspect-ratio: auto; /* Global styles.css aspect-ratio kuralını devre dışı bırak */
+            aspect-ratio: unset !important; /* styles.css'teki aspect-ratio boşluk yapıyor */
             transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
         }
-        .gallery-item img {
+        .gallery-page .gallery-item img {
             width: 100%;
-            height: 190px;
+            height: 240px;
             display: block;
-            object-fit: contain;
-            background: rgba(248, 250, 252, 0.6);
+            object-fit: cover;
             transition: transform .3s ease;
         }
-        .gallery-item:hover img {
+        .gallery-page .gallery-item:hover img {
             transform: scale(1.04);
         }
-        .gallery-item:hover {
+        .gallery-page .gallery-item:hover {
             transform: translateY(-4px);
             border-color: rgba(15, 118, 110, 0.35);
             box-shadow: 0 16px 32px rgba(2, 6, 23, 0.12);
         }
         .gallery-caption {
-            padding: 6px 14px;
+            padding: 10px 14px;
             font-size: 13px;
             color: var(--primary);
             line-height: 1.3;
-            min-height: 26px;
             background: linear-gradient(180deg, rgba(248, 250, 252, 0.7), rgba(248, 250, 252, 1));
             border-top: 1px solid rgba(226, 232, 240, 0.9);
             white-space: nowrap;
@@ -172,8 +170,7 @@
         @media (max-width: 640px) {
             .gallery-title { font-size: 34px; }
             .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-            .gallery-item img { height: 150px; }
-            .gallery-caption { min-height: 24px; }
+            .gallery-page .gallery-item img { height: 190px; }
         }
     </style>
 </head>
