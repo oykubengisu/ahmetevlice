@@ -7,6 +7,7 @@
     { "source": "/hakkimda", "destination": "/biography.html" },
     { "source": "/blog", "destination": "/blog.html" },
     { "source": "/galeri", "destination": "/galeri.html" },
+    { "source": "/randevu", "destination": "/randevu.html" },
     { "source": "/makaleler", "destination": "/makaleler.html" },
     { "source": "/demans-alzheimer-parkinson", "destination": "/demans-alzheimer-parkinson.html" },
     { "source": "/noropsikoloji", "destination": "/noropsikoloji.html" },

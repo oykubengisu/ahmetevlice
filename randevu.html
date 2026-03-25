@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Randevu Al - Prof. Dr. Ahmet Evlice | Nöroloji Uzmanı</title>
+    <link rel="canonical" href="https://ahmetevlice.com/randevu">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-92G2VK28F2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-92G2VK28F2');
+    </script>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        .randevu-page {
+            padding-top: 120px;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+        .randevu-hero {
+            background: var(--white);
+            padding: 56px 0;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        .randevu-title {
+            font-size: 44px;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .randevu-subtitle {
+            text-align: center;
+            color: var(--gray);
+            max-width: 760px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+        .randevu-cta {
+            text-align: center;
+            margin-top: 26px;
+        }
+        .randevu-cta .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 26px;
+        }
+        .contact-compact {
+            background: transparent;
+        }
+        .contact-compact .section-description {
+            margin-bottom: 22px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-icon"></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="/" class="nav-logo">
+                <span class="logo-text">Prof. Dr.</span>
+                <span class="logo-name">AHMET EVLİCE</span>
+                <span class="logo-title">Nöroloji Uzmanı</span>
+            </a>
+
+            <div class="nav-menu" id="nav-menu">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="/" class="nav-link">Anasayfa</a></li>
+                    <li class="nav-item"><a href="/#about" class="nav-link">Hakkımda</a></li>
+                    <li class="nav-item"><a href="/#expertise" class="nav-link">Uzmanlık Alanları</a></li>
+                    <li class="nav-item"><a href="/makaleler" class="nav-link">Makaleler</a></li>
+                    <li class="nav-item"><a href="/blog" class="nav-link">Blog</a></li>
+                    <li class="nav-item"><a href="/galeri" class="nav-link">Galeri</a></li>
+                    <li class="nav-item"><a href="#contact" class="nav-link active">İletişim</a></li>
+                </ul>
+                <div class="nav-close" id="nav-close">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+
+            <div class="nav-actions">
+                <button class="theme-toggle" id="theme-toggle" title="Tema Değiştir">
+                    <i class="fas fa-moon"></i><i class="fas fa-sun"></i>
+                </button>
+                <div class="nav-toggle" id="nav-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="randevu-page">
+        <section class="randevu-hero">
+            <div class="container">
+                <h1 class="randevu-title">Randevu Al</h1>
+                <p class="randevu-subtitle">
+                    WhatsApp üzerinden randevu talebinizi oluşturun. Admin panelinden tanımlanan WhatsApp numaranızla otomatik olarak yönlendirilirsiniz.
+                </p>
+                <div class="randevu-cta">
+                    <a href="#" class="btn btn-primary whatsapp-btn" id="whatsapp-btn" target="_blank" rel="noopener noreferrer" onclick="return false;">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>WhatsApp ile Randevu</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Compact Contact Preview -->
+        <section class="contact section contact-compact" id="contact">
+            <div class="container">
+                <div class="section-header center" data-aos="fade-up">
+                    <span class="section-subtitle">İletişim</span>
+                    <h2 class="section-title">Bize Ulaşın</h2>
+                    <p class="section-description">
+                        Adres, telefon ve çalışma saatleri bilgilerine aşağıdan ulaşabilirsiniz.
+                    </p>
+                </div>
+
+                <div class="contact-cards-row" data-aos="fade-up">
+                    <div class="info-card" data-aos="fade-up" data-aos-delay="100">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3>Adres</h3>
+                            <p>Ziyapaşa, 67055. Sk. No:1<br>01140 Seyhan/Adana</p>
+                        </div>
+                    </div>
+
+                    <div class="info-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="info-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="info-content" id="contact-phone-card">
+                            <h3>Telefon</h3>
+                            <p>
+                                <a href="tel:05455254470" id="contact-phone-link" class="phone-link">0545 525 4470</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="info-card" data-aos="fade-up" data-aos-delay="300">
+                        <div class="info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3>E-posta</h3>
+                            <p><a href="mailto:info@ahmetevlice.com">info@ahmetevlice.com</a></p>
+                        </div>
+                    </div>
+
+                    <div class="info-card" data-aos="fade-up" data-aos-delay="400">
+                        <div class="info-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3>Çalışma Saatleri</h3>
+                            <p>Pazartesi - Cuma: 09:00 - 17:00</p>
+                            <p>Cumartesi: 09:00 - 13:00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-map" data-aos="fade-up">
+                    <iframe
+                        src="https://www.google.com/maps?q=Ortadoğu+Hastanesi+Adana&output=embed"
+                        width="100%"
+                        height="450"
+                        style="border:0; border-radius: 20px;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Google Haritası - Ortadoğu Hastanesi, Adana">
+                    </iframe>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Back to Top -->
+    <a href="#header" class="back-to-top" id="back-to-top" aria-label="Sayfanın başına dön">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
