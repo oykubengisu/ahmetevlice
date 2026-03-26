@@ -84,16 +84,14 @@
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            aspect-ratio: unset !important; /* styles.css'teki aspect-ratio boşluk yapıyor */
+            aspect-ratio: unset !important; /* boşluk oluşturan global aspect-ratio'yu etkisizleştir */
             transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
         }
         .gallery-page .gallery-item img {
             width: 100%;
-            aspect-ratio: 16 / 9;
             height: auto;
             display: block;
-            object-fit: contain; /* Kırpma olmadan tam görsel */
-            background: rgba(248, 250, 252, 0.6);
+            object-fit: unset; /* görselin kendi oranına göre ölçeklensin */
             transition: transform .3s ease;
         }
         .gallery-page .gallery-item:hover img {
