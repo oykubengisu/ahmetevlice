@@ -89,7 +89,8 @@
         }
         .gallery-page .gallery-item img {
             width: 100%;
-            height: 240px;
+            aspect-ratio: 16 / 9;
+            height: auto;
             display: block;
             object-fit: cover;
             transition: transform .3s ease;
@@ -170,7 +171,6 @@
         @media (max-width: 640px) {
             .gallery-title { font-size: 34px; }
             .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-            .gallery-page .gallery-item img { height: 190px; }
         }
     </style>
 </head>
