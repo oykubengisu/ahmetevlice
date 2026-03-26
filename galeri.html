@@ -92,7 +92,8 @@
             aspect-ratio: 16 / 9;
             height: auto;
             display: block;
-            object-fit: cover;
+            object-fit: contain; /* Kırpma olmadan tam görsel */
+            background: rgba(248, 250, 252, 0.6);
             transition: transform .3s ease;
         }
         .gallery-page .gallery-item:hover img {
