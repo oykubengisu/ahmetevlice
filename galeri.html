@@ -94,13 +94,13 @@
         .gallery-page .gallery-item img {
             width: 100%;
             height: auto;
-            max-height: 220px; /* kartı çok az küçült */
+            max-height: 200px; /* kartı biraz daha küçült */
             display: block;
             object-fit: unset; /* görselin kendi oranına göre ölçeklensin */
             transition: transform .3s ease;
         }
         .gallery-page .gallery-item:hover img {
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
         .gallery-page .gallery-item:hover {
             transform: translateY(-4px);
@@ -177,7 +177,7 @@
         @media (max-width: 640px) {
             .gallery-title { font-size: 34px; }
             .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-            .gallery-page .gallery-item img { max-height: 190px; }
+            .gallery-page .gallery-item img { max-height: 165px; }
         }
     </style>
 </head>
