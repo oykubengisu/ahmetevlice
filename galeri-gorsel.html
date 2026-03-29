@@ -170,6 +170,20 @@
     <script>
         const API_BASE_GALLERY = '';
 
+        /** Dosya adından görsel uzantısını kaldırır (.jpeg, .jpg vb.) */
+        function stripImageExtension(filename) {
+            if (!filename) return '';
+            return String(filename).replace(/\.(jpe?g|png|gif|webp|bmp|svg)$/i, '');
+        }
+
+        /** Başlıkta gösterilecek metin: önce açıklama, yoksa uzantısız dosya adı */
+        function getGalleryDisplayTitle(media) {
+            const desc = media.description != null ? String(media.description).trim() : '';
+            if (desc) return desc;
+            const base = stripImageExtension(media.name);
+            return base || 'Galeri görseli';
+        }
+
         async function loadGalleryImage() {
             const params = new URLSearchParams(window.location.search);
             const idParam = params.get('id');
@@ -208,12 +222,21 @@
                 return;
             }
 
-            titleEl.textContent = media.name || 'Galeri görseli';
+            const displayTitle = getGalleryDisplayTitle(media);
+            titleEl.textContent = displayTitle;
+            document.title = displayTitle + ' - Galeri - Prof. Dr. Ahmet Evlice';
+
             imageEl.src = media.data;
-            imageEl.alt = media.name || 'Galeri görseli';
-            captionEl.textContent = media.description && String(media.description).trim() !== ''
-                ? String(media.description)
-                : (media.name || 'Açıklama eklenmemiş.');
+            imageEl.alt = displayTitle;
+
+            const desc = media.description != null ? String(media.description).trim() : '';
+            if (desc) {
+                captionEl.textContent = '';
+                captionEl.style.display = 'none';
+            } else {
+                captionEl.style.display = 'flex';
+                captionEl.textContent = stripImageExtension(media.name) || 'Açıklama eklenmemiş.';
+            }
 
             cardEl.style.display = 'block';
             emptyEl.style.display = 'none';
