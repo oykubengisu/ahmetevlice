@@ -6,6 +6,11 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const {
+  enrichMediaGalleryWithSlugs,
+  nextSlugForNewItem,
+  slugAfterDescriptionUpdate
+} = require('./media-slug');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -233,7 +238,19 @@ app.put('/api/pages/:key', requireAuth, (req, res) => {
 // ================================
 app.get('/api/media', (req, res) => {
   const data = loadData();
-  res.json(data.media_gallery || []);
+  const list = Array.isArray(data.media_gallery) ? data.media_gallery : [];
+  const enriched = enrichMediaGalleryWithSlugs(list);
+  let dirty = false;
+  const merged = list.map((orig, i) => {
+    const slug = enriched[i].slug;
+    if (orig.slug !== slug) dirty = true;
+    return { ...orig, slug };
+  });
+  if (dirty) {
+    data.media_gallery = merged;
+    saveData(data);
+  }
+  res.json(enriched);
 });
 
 app.post('/api/media', requireAuth, (req, res) => {
@@ -247,15 +264,15 @@ app.post('/api/media', requireAuth, (req, res) => {
   const id = item.id || Date.now().toString(36) + Math.random().toString(36).slice(2);
   const now = new Date().toISOString();
 
-  data.media_gallery = [
-    {
-      ...item,
-      description: (item.description || '').toString(),
-      id,
-      uploadedAt: now
-    },
-    ...(data.media_gallery || [])
-  ];
+  const existing = data.media_gallery || [];
+  const newRow = {
+    ...item,
+    description: (item.description || '').toString(),
+    id,
+    uploadedAt: now
+  };
+  newRow.slug = nextSlugForNewItem(newRow, id, existing);
+  data.media_gallery = [newRow, ...existing];
 
   saveData(data);
   res.json({ ok: true, item: data.media_gallery.find(m => m.id === id) });
@@ -270,10 +287,15 @@ app.put('/api/media/:id', requireAuth, (req, res) => {
     return res.status(404).json({ error: 'Öğe bulunamadı' });
   }
   const body = req.body || {};
-  media[idx] = {
+  const nextDesc = body.description !== undefined ? String(body.description || '') : media[idx].description;
+  const updated = {
     ...media[idx],
-    description: body.description !== undefined ? String(body.description || '') : media[idx].description
+    description: nextDesc
   };
+  if (body.description !== undefined) {
+    updated.slug = slugAfterDescriptionUpdate(updated, id, media);
+  }
+  media[idx] = updated;
   data.media_gallery = media;
   saveData(data);
   res.json({ ok: true, item: media[idx] });

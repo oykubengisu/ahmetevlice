@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galeri Görseli - Prof. Dr. Ahmet Evlice</title>
     <meta name="description" content="Galeri görseli detay sayfası.">
-    <link rel="canonical" href="https://ahmetevlice.com/galeri-gorsel">
+    <link rel="canonical" id="gallery-canonical" href="https://ahmetevlice.com/galeri">
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-92G2VK28F2"></script>
     <script>
@@ -24,7 +24,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <style>
         .gallery-detail-page {
             padding-top: 120px;
@@ -166,9 +166,18 @@
         </section>
     </main>
 
-    <script src="script.js"></script>
+    <script src="/script.js"></script>
+    <script src="/gallery-slug-client.js"></script>
     <script>
         const API_BASE_GALLERY = '';
+        const GALLERY_SITE_ORIGIN = 'https://ahmetevlice.com';
+
+        /** Adres çubuğundan /galeri/:slug parçasını okur */
+        function getSlugFromPathname() {
+            var path = window.location.pathname || '';
+            var m = path.match(/\/galeri\/([^/]+)\/?$/);
+            return m ? decodeURIComponent(m[1]) : '';
+        }
 
         /** Dosya adından görsel uzantısını kaldırır (.jpeg, .jpg vb.) */
         function stripImageExtension(filename) {
@@ -187,14 +196,19 @@
         async function loadGalleryImage() {
             const params = new URLSearchParams(window.location.search);
             const idParam = params.get('id');
+            const slugQuery = params.get('slug');
+            const slugFromPath = getSlugFromPathname();
+            const lookupSlug = slugFromPath || slugQuery;
 
             const titleEl = document.getElementById('gallery-detail-title');
             const cardEl = document.getElementById('gallery-detail-card');
             const emptyEl = document.getElementById('gallery-detail-empty');
             const imageEl = document.getElementById('gallery-detail-image');
             const captionEl = document.getElementById('gallery-detail-caption');
+            const canonicalEl = document.getElementById('gallery-canonical');
+            const metaDescEl = document.querySelector('meta[name="description"]');
 
-            if (!idParam) {
+            if (!lookupSlug && !idParam) {
                 titleEl.textContent = 'Görsel bulunamadı';
                 cardEl.style.display = 'none';
                 emptyEl.style.display = 'block';
@@ -203,17 +217,32 @@
 
             let items = [];
             try {
-                const r = await fetch(API_BASE_GALLERY + '/api/media');
+                const r = await fetch(API_BASE_GALLERY + '/api/media', { cache: 'no-store' });
                 if (!r.ok) throw new Error('API error');
                 items = await r.json();
+                if (!Array.isArray(items)) items = [];
             } catch (e) {
                 const raw = localStorage.getItem('media_gallery');
                 if (raw) {
                     try { items = JSON.parse(raw); } catch (err) { items = []; }
                 }
+                if (!Array.isArray(items)) items = [];
             }
 
-            const media = (items || []).find(m => String(m.id) === String(idParam));
+            if (window.GallerySlug && typeof window.GallerySlug.enrichMediaGalleryWithSlugs === 'function') {
+                items = window.GallerySlug.enrichMediaGalleryWithSlugs(items);
+            }
+
+            let media = null;
+            if (lookupSlug) {
+                const lu = String(lookupSlug).toLowerCase();
+                media = (items || []).find(function (m) {
+                    return m.slug != null && String(m.slug).toLowerCase() === lu;
+                });
+            }
+            if (!media && idParam) {
+                media = (items || []).find(function (m) { return String(m.id) === String(idParam); });
+            }
 
             if (!media) {
                 titleEl.textContent = 'Görsel bulunamadı';
@@ -225,6 +254,19 @@
             const displayTitle = getGalleryDisplayTitle(media);
             titleEl.textContent = displayTitle;
             document.title = displayTitle + ' - Galeri - Prof. Dr. Ahmet Evlice';
+
+            if (canonicalEl && media.slug) {
+                canonicalEl.setAttribute('href', GALLERY_SITE_ORIGIN + '/galeri/' + encodeURIComponent(media.slug));
+            }
+            if (metaDescEl) {
+                metaDescEl.setAttribute('content', displayTitle + ' — Prof. Dr. Ahmet Evlice galeri görseli.');
+            }
+
+            var path = window.location.pathname || '';
+            var onCleanGalleryUrl = /^\/galeri\/[^/]+\/?$/.test(path);
+            if (media.slug && !onCleanGalleryUrl) {
+                history.replaceState({}, '', '/galeri/' + encodeURIComponent(media.slug));
+            }
 
             imageEl.src = media.data;
             imageEl.alt = displayTitle;
