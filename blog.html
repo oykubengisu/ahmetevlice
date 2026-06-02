@@ -472,6 +472,12 @@
                         pdfUrl: b.pdfUrl || '',
                         pdfData: b.pdfData || null
                     };
+                })
+                .sort((a, b) => {
+                    // Yeni yüklenen/yayınlanan yazılar üstte görünsün.
+                    const aTime = new Date(a.date).getTime();
+                    const bTime = new Date(b.date).getTime();
+                    return (isNaN(bTime) ? 0 : bTime) - (isNaN(aTime) ? 0 : aTime);
                 });
 
             return mapped;
