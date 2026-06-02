@@ -398,6 +398,13 @@
             });
         }
 
+        function isBlogKind(kindValue) {
+            const normalized = String(kindValue || '')
+                .trim()
+                .toLocaleLowerCase('tr-TR');
+            return normalized === 'blog' || normalized === 'blog yazıları' || normalized === 'blog yazilari';
+        }
+
         async function loadBlogDetail() {
             const params = new URLSearchParams(window.location.search);
             const idParam = params.get('id');
@@ -429,7 +436,7 @@
 
             const blog = blogs
                 .filter(b => b.status === 'published')
-                .filter(b => (b.kind || 'makale') === 'blog')
+                .filter(b => isBlogKind(b.kind))
                 .find((b, index) => {
                     const storedId = b.id != null ? String(b.id) : null;
                     if (storedId && storedId === idParam) return true;

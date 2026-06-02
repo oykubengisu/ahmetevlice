@@ -444,6 +444,13 @@
             });
         }
 
+        function isBlogKind(kindValue) {
+            const normalized = String(kindValue || '')
+                .trim()
+                .toLocaleLowerCase('tr-TR');
+            return normalized === 'blog' || normalized === 'blog yazıları' || normalized === 'blog yazilari';
+        }
+
         async function getBlogArticles() {
             let blogs = [];
             try {
@@ -458,15 +465,18 @@
             // Sadece admin panelinde Tür = 'Blog Yazıları' olan ve yayınlanmış yazıları getir
             const mapped = blogs
                 .filter(b => b.status === 'published')
-                .filter(b => (b.kind || 'makale') === 'blog')
+                .filter(b => isBlogKind(b.kind))
                 .map((b, idx) => {
                     const cfg = categoryConfig[b.category] || categoryConfig['genel'];
+                    const rawDate = b.date || b.createdAt || '';
+                    const timestamp = new Date(rawDate).getTime();
                     return {
                         id: b.id || idx,
                         category: b.category || 'genel',
                         title: b.title,
                         excerpt: b.excerpt || b.title,
-                        date: formatBlogDate(b.date || b.createdAt),
+                        date: formatBlogDate(rawDate),
+                        sortTime: isNaN(timestamp) ? 0 : timestamp,
                         imageColor: cfg.color,
                         icon: cfg.icon,
                         pdfUrl: b.pdfUrl || '',
@@ -475,9 +485,7 @@
                 })
                 .sort((a, b) => {
                     // Yeni yüklenen/yayınlanan yazılar üstte görünsün.
-                    const aTime = new Date(a.date).getTime();
-                    const bTime = new Date(b.date).getTime();
-                    return (isNaN(bTime) ? 0 : bTime) - (isNaN(aTime) ? 0 : aTime);
+                    return b.sortTime - a.sortTime;
                 });
 
             return mapped;
