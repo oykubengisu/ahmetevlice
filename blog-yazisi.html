@@ -137,6 +137,33 @@
             border-radius: 0 12px 12px 0;
         }
 
+        .blog-pdf-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .blog-pdf-actions .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: var(--accent);
+            color: var(--white);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .blog-pdf-embed {
+            width: 100%;
+            height: 900px;
+            border: 1px solid var(--light-gray);
+            border-radius: 12px;
+            background: var(--white);
+        }
+
         @media screen and (max-width: 768px) {
             .blog-detail-title {
                 font-size: 26px;
@@ -441,8 +468,25 @@
             categoryBadge.innerHTML = '<i class="fas ' + iconClass + '"></i><span id="blog-category-text">' + categoryName + '</span>';
             categoryBadge.style.display = 'inline-flex';
 
-            // İçeriği HTML olarak bas (admin panelinde zengin metin olarak giriliyor)
-            contentEl.innerHTML = blog.content || '<p>' + (blog.excerpt || '') + '</p>';
+            const pdfLink = blog.pdfUrl || blog.pdfData || '';
+            const hasContent = !!(blog.content && String(blog.content).trim());
+
+            // PDF varsa makalelerdeki davranışa benzer şekilde PDF'i öne çıkar.
+            if (pdfLink) {
+                contentEl.innerHTML = `
+                    <div class="blog-pdf-actions">
+                        <a href="${pdfLink}" target="_blank" rel="noopener noreferrer" class="btn">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>PDF'i Yeni Sekmede Aç</span>
+                        </a>
+                    </div>
+                    <iframe class="blog-pdf-embed" src="${pdfLink}" title="${blog.title} PDF"></iframe>
+                `;
+                return;
+            }
+
+            // PDF yoksa klasik içerik
+            contentEl.innerHTML = hasContent ? blog.content : '<p>' + (blog.excerpt || '') + '</p>';
         }
 
         document.addEventListener('DOMContentLoaded', loadBlogDetail);

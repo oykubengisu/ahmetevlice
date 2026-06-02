@@ -497,10 +497,15 @@
             noResults.style.display = 'none';
 
             grid.innerHTML = filteredArticles.map(article => {
+                const pdfLink = article.pdfUrl || article.pdfData || '';
+                const hasPdf = !!pdfLink;
                 const detailUrl = `/blog-yazisi.html?id=${encodeURIComponent(article.id)}`;
+                const cardHref = hasPdf ? pdfLink : detailUrl;
+                const cardTarget = hasPdf ? ' target="_blank" rel="noopener noreferrer"' : '';
+                const linkText = hasPdf ? 'PDF\'i Aç' : 'Devamını Oku';
 
                 return `
-                <a href="${detailUrl}" class="blog-article-card" data-article-id="${article.id}">
+                <a href="${cardHref}"${cardTarget} class="blog-article-card" data-article-id="${article.id}">
                     <div class="blog-article-image">
                         <div class="blog-image-placeholder" style="background: ${article.imageColor};">
                             <i class="fas ${article.icon}"></i>
@@ -514,7 +519,7 @@
                             <span><i class="fas fa-calendar-alt"></i> ${article.date}</span>
                         </div>
                         <span class="blog-article-link">
-                            <span>Devamını Oku</span>
+                            <span>${linkText}</span>
                             <i class="fas fa-arrow-right"></i>
                         </span>
                     </div>
