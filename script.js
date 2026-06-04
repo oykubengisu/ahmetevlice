@@ -595,7 +595,7 @@ async function loadDynamicBlogs() {
         const icon = categoryIcons[blog.category] || 'fas fa-newspaper';
         const label = categoryLabels[blog.category] || blog.category;
         const delay = ((index % 3) + 1) * 100;
-        const detailUrl = `/blog-yazisi.html?id=${encodeURIComponent(id)}`;
+        const detailUrl = `/blog-yazisi?id=${encodeURIComponent(id)}`;
         const linkAttrs = `href="${detailUrl}"`;
 
         // Aynı kategori görsellerini blog.html ile eşleştirmek için arka plan renkleri

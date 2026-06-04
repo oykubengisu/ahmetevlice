@@ -396,6 +396,7 @@
         <i class="fas fa-chevron-up"></i>
     </a>
 
+    <script src="blog-pdf-utils.js"></script>
     <script src="script.js"></script>
     <script>
         const API_BASE_BLOG = ''; // Aynı domain (Vercel)
@@ -511,15 +512,16 @@
             noResults.style.display = 'none';
 
             grid.innerHTML = filteredArticles.map(article => {
-                const pdfLink = article.pdfUrl || article.pdfData || '';
+                const pdfLink = window.BlogPdfUtils
+                    ? window.BlogPdfUtils.resolvePdfUrl(article.pdfUrl, article.pdfData)
+                    : (article.pdfUrl || '');
                 const hasPdf = !!pdfLink;
-                const detailUrl = `/blog-yazisi.html?id=${encodeURIComponent(article.id)}`;
-                const cardHref = hasPdf ? pdfLink : detailUrl;
-                const cardTarget = hasPdf ? ' target="_blank" rel="noopener noreferrer"' : '';
-                const linkText = hasPdf ? 'PDF\'i Aç' : 'Devamını Oku';
+                const detailUrl = `/blog-yazisi?id=${encodeURIComponent(article.id)}`;
+                const cardHref = detailUrl;
+                const linkText = hasPdf ? 'PDF ile Oku' : 'Devamını Oku';
 
                 return `
-                <a href="${cardHref}"${cardTarget} class="blog-article-card" data-article-id="${article.id}">
+                <a href="${cardHref}" class="blog-article-card" data-article-id="${article.id}">
                     <div class="blog-article-image">
                         <div class="blog-image-placeholder" style="background: ${article.imageColor};">
                             <i class="fas ${article.icon}"></i>

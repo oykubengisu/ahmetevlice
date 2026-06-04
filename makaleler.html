@@ -396,6 +396,7 @@
         <i class="fas fa-chevron-up"></i>
     </a>
 
+    <script src="blog-pdf-utils.js"></script>
     <script src="script.js"></script>
     <script>
         const API_BASE_BLOG = ''; // Aynı domain (Vercel)
@@ -493,10 +494,12 @@
             noResults.style.display = 'none';
             
             grid.innerHTML = filteredArticles.map(article => {
-                const pdfLink = article.pdfUrl || article.pdfData;
-                const linkAttrs = pdfLink 
-                    ? `href="${pdfLink}" target="_blank"` 
-                    : 'href="#"';
+                const pdfLink = window.BlogPdfUtils
+                    ? window.BlogPdfUtils.resolvePdfUrl(article.pdfUrl, article.pdfData)
+                    : (article.pdfUrl || article.pdfData || '');
+                const linkAttrs = pdfLink
+                    ? `href="${pdfLink}" target="_blank" rel="noopener noreferrer"`
+                    : 'href="#" onclick="return false;"';
 
                 return `
                 <a ${linkAttrs} class="blog-article-card" data-article-id="${article.id}">

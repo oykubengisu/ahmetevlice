@@ -6,6 +6,7 @@
     { "source": "/api/(.*)", "destination": "/api?path=$1" },
     { "source": "/hakkimda", "destination": "/biography.html" },
     { "source": "/blog", "destination": "/blog.html" },
+    { "source": "/blog-yazisi", "destination": "/blog-yazisi.html" },
     { "source": "/galeri", "destination": "/galeri.html" },
     { "source": "/galeri/:slug", "destination": "/galeri-gorsel.html" },
     { "source": "/randevu", "destination": "/randevu.html" },

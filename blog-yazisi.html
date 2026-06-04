@@ -354,6 +354,7 @@
         <i class="fas fa-chevron-up"></i>
     </a>
 
+    <script src="blog-pdf-utils.js"></script>
     <script src="script.js"></script>
     <script>
         const API_BASE_BLOG = ''; // Aynı domain (Vercel)
@@ -434,15 +435,18 @@
                 }
             }
 
-            const blog = blogs
-                .filter(b => b.status === 'published')
-                .filter(b => isBlogKind(b.kind))
-                .find((b, index) => {
-                    const storedId = b.id != null ? String(b.id) : null;
-                    if (storedId && storedId === idParam) return true;
-                    // Eski kayıtlarda id yoksa index ile eşleştir
-                    return String(index) === idParam;
-                });
+            let blog = blogs.find(b => b.id != null && String(b.id) === idParam);
+
+            if (!blog) {
+                const publishedBlogs = blogs
+                    .filter(b => b.status === 'published')
+                    .filter(b => isBlogKind(b.kind));
+                blog = publishedBlogs.find((b, index) => String(index) === idParam);
+            }
+
+            if (!blog || blog.status !== 'published' || !isBlogKind(blog.kind)) {
+                blog = null;
+            }
 
             if (!blog) {
                 titleEl.textContent = 'Blog yazısı bulunamadı';
@@ -475,11 +479,14 @@
             categoryBadge.innerHTML = '<i class="fas ' + iconClass + '"></i><span id="blog-category-text">' + categoryName + '</span>';
             categoryBadge.style.display = 'inline-flex';
 
-            const pdfLink = blog.pdfUrl || blog.pdfData || '';
+            const pdfLink = window.BlogPdfUtils
+                ? window.BlogPdfUtils.resolvePdfUrl(blog.pdfUrl, blog.pdfData)
+                : (blog.pdfUrl || blog.pdfData || '');
             const hasContent = !!(blog.content && String(blog.content).trim());
 
             // PDF varsa makalelerdeki davranışa benzer şekilde PDF'i öne çıkar.
             if (pdfLink) {
+                const safeTitle = (blog.title || 'PDF').replace(/"/g, '&quot;');
                 contentEl.innerHTML = `
                     <div class="blog-pdf-actions">
                         <a href="${pdfLink}" target="_blank" rel="noopener noreferrer" class="btn">
@@ -487,8 +494,11 @@
                             <span>PDF'i Yeni Sekmede Aç</span>
                         </a>
                     </div>
-                    <iframe class="blog-pdf-embed" src="${pdfLink}" title="${blog.title} PDF"></iframe>
+                    <iframe class="blog-pdf-embed" src="${pdfLink}" title="${safeTitle}"></iframe>
                 `;
+                if (hasContent) {
+                    contentEl.innerHTML += `<div class="blog-detail-content" style="margin-top:28px;">${blog.content}</div>`;
+                }
                 return;
             }
 
